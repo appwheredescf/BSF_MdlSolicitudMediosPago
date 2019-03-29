@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8"/>
+    <th:block th:include="layout/headGlobal :: head"/>
+    <th:block th:include="layout/headDataTables :: head"/>
+    <title>Menú</title>
+</head>
+<body>
+<div class="container_48">
+    <div class="contenedor">
+        <div class="contenedor-form">
+            <div class="titulo centrar-objeto btn-inline-set">
+                <button class="ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only"
+                        onclick="parent.regresarMenuFrecuente();" type="submit" role="button" aria-disabled="false">
+                    <span class="ui-button-icon-left ui-icon ui-c ui-icon-arrow-1-w"></span>
+                    <span class="ui-button-text ui-c">ui-button</span></button>
+                <div>
+                    <h2 class="gris-b">Menu</h2>
+                </div>
+            </div>
+            <div class="contenedor-campos">
+                <div class="row">
+                    <div class="grid_48">
+                        <form method="POST" id="formMain">
+                            <div class="row-flex">
+                                <div class="grid_24">
+                                    <input name="BSFOPERADOR" id="BFOPERADOR" class="form-control" th:value="${BSFOPERADOR}"/>
+                                </div>
+                                <div class="grid_24">
+                                    <select name="opcion" class="form-control" id="option">
+                                        <option th:value="@{/example}">Vista Example</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row-flex">
+                                <div class="grid_48">
+                                    <button type="button" id="btnMenu" onclick="send();" class="btn btn-primary">enviar</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script th:inline="javascript" th:src="@{/js/main/main.js}"></script>
+</body>
+</html>

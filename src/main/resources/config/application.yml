@@ -1,0 +1,14 @@
+spring:
+  profiles:
+    active:
+      development
+  config:
+    location: /src/main/resources/config
+server:
+  port: 8083
+  servlet:
+    context-path: /BSF_MdlSolicitudMediosPago
+banner:
+  location: banner.txt
+logging:
+  config: src/main/resources/config/logback-spring.xml

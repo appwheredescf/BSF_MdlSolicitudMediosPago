@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration debug="true">
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+
+    <springProfile name="development">
+        <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
+        <root level="INFO">
+            <appender-ref ref="CONSOLE"/>
+        </root>
+        <springProfile name="debug">
+            <root level="DEBUG">
+                <appender-ref ref="CONSOLE"/>
+            </root>
+        </springProfile>
+    </springProfile>
+
+    <springProfile name="production">
+        <property name="LOG_PATH" value="logs"/>
+        <property name="LOG_FILE" value="remittances-data"/>
+
+        <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+            <target>System.out</target>
+            <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+                <level>INFO</level> <!-- Print only INFO, WARN and ERROR level -->
+            </filter>
+            <encoder>
+                <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+                <charset>utf8</charset>
+            </encoder>
+        </appender>
+
+        <appender name="GENERAL_LOGGER"
+                  class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <encoder>
+                <pattern>${FILE_LOG_PATTERN}</pattern>
+            </encoder>
+            <file>${LOG_PATH}/${LOG_FILE}.log</file>
+            <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+                <fileNamePattern>${LOG_PATH}/archive/%d{yyyy-MM-dd}-${LOG_FILE}.%i.log</fileNamePattern>
+                <maxFileSize>${MAX_FILE_SIZE:-10MB}</maxFileSize>
+                <maxHistory>${MAX_HISTORY:-0}</maxHistory>
+            </rollingPolicy>
+        </appender>
+        <logger name="mx.appwhere.remittances.application.controllers.RestExceptionHandler"
+                additivity="false" level="ERROR">
+            <appender-ref ref="GENERAL_LOGGER"/>
+        </logger>
+        <root level="INFO">
+            <appender-ref ref="GENERAL_LOGGER"/>
+            <appender-ref ref="STDOUT"/>
+        </root>
+        <springProfile name="debug">
+            <root level="DEBUG">
+                <appender-ref ref="GENERAL_LOGGER"/>
+            </root>
+        </springProfile>
+    </springProfile>
+</configuration>

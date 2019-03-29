@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <th:block th:include="layout/headGlobal :: head"/>
+    <th:block th:include="layout/headDataTables :: head"/>
+    <script type="text/javascript" th:src="@{/js/jquery.validate.js}"></script>
+    <title>Title</title>
+</head>
+<body>
+<div class="container_48">
+    <div class="contenedor">
+        <div class="contenedor-form">
+            <div class="titulo centrar-objeto btn-inline-set">
+                <button class="ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only"
+                        onclick="parent.regresarMenuFrecuente();" type="submit" role="button" aria-disabled="false">
+                    <span class="ui-button-icon-left ui-icon ui-c ui-icon-arrow-1-w"></span>
+                    <span class="ui-button-text ui-c">ui-button</span></button>
+                <div>
+                    <h2 class="gris-b">Example</h2>
+                </div>
+            </div>
+            <div class="contenedor-campos">
+                <div class="row">
+                    <div class="grid_48">
+                        <h3>Nombre obtenido del BsfOperador</h3>
+                        <br>
+                        <p th:text="'Hola ' + ${nombre}"></p>
+                        <br>
+                        <h3>Digitalización</h3>
+                        <form th:action="${transportUri}" method="post">
+                            <input class="form-control col-md-6" name="TRANSPORT" id="TRANSPORT" th:value="${transport}">
+                            <div class="clear-row"></div>
+                            <button type="submit" class="btn btm-primary" id="btnTransport">Enviar</button>
+                        </form>
+                        <div class="clear-row"></div>
+                        <div class="clear-row"></div>
+                        <h3>Ejemplo de validaciones con JavaScript y con ExceptionController</h3>
+                        <form action="" method="post" id="formE">
+                            <p>En caso de que el formulario se envie vacio se mostraran los campos en rojo por parte de javaScript, si la edad enviada es menos a 18 o mayor a 150 el ExceptionController
+                             retornara un mensage y como un ejemplo tambien si la edad es igual a 30 retorna un mensaje diferente</p>
+                            <div class="form-group">
+                                <label>Nombre:</label>
+                                <input class="form-control col-md-4" name="name" id="name">
+                            </div>
+                            <div class="clear-row"></div>
+                            <div class="form-group">
+                                <label>Edad:</label>
+                                <input class="form-control col-md-4" name="age" id="age">
+                            </div>
+                            <div class="clear-row"></div>
+                            <button type="submit" class="btn btm-primary" id="btnE">Enviar</button>
+                        </form>
+                    </div>
+                    <div class="clear-row"></div>
+                    <div class="clear-row"></div>
+                    <p class="text-center" th:text="${doc}"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript" th:src="@{/js/ViewJs/Example.js}"> </script>
+</body>
+</html>

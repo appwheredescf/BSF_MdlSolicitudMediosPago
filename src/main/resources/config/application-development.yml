@@ -1,0 +1,24 @@
+# -------------- uris ------------------
+# enterprise service bus
+jboss:
+  scheme: http
+  host: 172.26.9.65
+  port: 7171
+  digitalizacion:
+    context-path: /BsfPortalSucursalesDigitalizacion
+    uri: ${jboss.scheme}://${jboss.host}:${jboss.port}${jboss.digitalizacion.context-path}/
+
+# back-end services
+
+wso2:
+  scheme: http
+  esb:
+    host: 172.26.9.65
+    port: 8288
+    wsBsfDigitalizacion:
+      context-path: /wsBsfDigitalizacion
+      identificationImage: ${wso2.scheme}://${wso2.esb.host}:${wso2.esb.port}${wso2.esb.wsBsfDigitalizacion.context-path}/ConsultaDocumentoId
+    wsBsfOperacionesSucursales:
+      context-path: /wsBsfOperacionesSucursales
+      encrypt: ${wso2.scheme}://${wso2.esb.host}:${wso2.esb.port}${wso2.esb.wsBsfOperacionesSucursales.context-path}/encrypt
+      decrypt: ${wso2.scheme}://${wso2.esb.host}:${wso2.esb.port}${wso2.esb.wsBsfOperacionesSucursales.context-path}/decrypt

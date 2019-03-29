@@ -1,0 +1,34 @@
+# -------------- uris ------------------
+# enterprise service bus
+jboss:
+  scheme: http
+  host: [IP_SERVIDOR_JBOSS]
+  port: [PUERTO_SERVIDOR_JBOSS]
+  digitalizacion:
+    context-path: /BsfPortalSucursalesDigitalizacion
+    uri: ${jboss.scheme}://${jboss.host}:${jboss.port}${jboss.digitalizacion.context-path}/
+
+# back-end services
+
+wso2:
+  scheme: http
+  esb:
+    host: [IP_SERVIDOR_ESB]
+    port: [PUERTO_SERVIDOR_ESB]
+    wsBsfDigitalizacion:
+      context-path: /wsBsfDigitalizacion
+      identificationImage: ${wso2.scheme}://${wso2.esb.host}:${wso2.esb.port}${wso2.esb.wsBsfDigitalizacion.context-path}/ConsultaDocumentoId
+    wsBsfOperacionesSucursales:
+      context-path: /wsBsfOperacionesSucursales
+      encrypt: ${wso2.scheme}://${wso2.esb.host}:${wso2.esb.port}${wso2.esb.wsBsfOperacionesSucursales.context-path}/encrypt
+      decrypt: ${wso2.scheme}://${wso2.esb.host}:${wso2.esb.port}${wso2.esb.wsBsfOperacionesSucursales.context-path}/decrypt
+  as:
+    host: [IP_SERVIDOR_AS]
+    port: [PUERTO_SERVIDOR_AS]
+    war1:
+      context-path: /war1
+      funcionalidad1: ${wso2.scheme}://${wso2.as.host}:${wso2.as.port}${wso2.as.war1.context-path}/funcionalidad1
+      funcionalidad2: ${wso2.scheme}://${wso2.as.host}:${wso2.as.port}${wso2.as.war1.context-path}/funcionalidad2
+    war2:
+      context-path: /war2
+      funcionalidad1: ${wso2.scheme}://${wso2.as.host}:${wso2.as.port}${wso2.as.war2.context-path}/funcionalidad1
