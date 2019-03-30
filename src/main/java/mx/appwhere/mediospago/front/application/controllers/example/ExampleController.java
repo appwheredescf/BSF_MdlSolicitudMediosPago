@@ -9,6 +9,7 @@ import mx.appwhere.mediospago.front.application.constants.ApplicationConstants;
 import mx.appwhere.mediospago.front.application.controllers.ExceptionController;
 import mx.appwhere.mediospago.front.application.dto.ejemplo.EjemploDto;
 import mx.appwhere.mediospago.front.application.dto.ejemplo.ExampleDto;
+import mx.appwhere.mediospago.front.application.serviceimpl.PruebaServiceImpl;
 import mx.appwhere.mediospago.front.domain.exceptions.ViewException;
 import mx.appwhere.mediospago.front.domain.exceptions.ajax.FormatException;
 import mx.appwhere.mediospago.front.domain.services.MainService;
@@ -20,14 +21,18 @@ import javax.validation.Valid;
 public class ExampleController extends ExceptionController {
 
     private MainService mainService;
+    
+    private PruebaServiceImpl pruebaService;
 
     @Autowired
-    public ExampleController(MainService mainService) {
+    public ExampleController(MainService mainService, PruebaServiceImpl pruebaService) {
         this.mainService = mainService;
+        this.pruebaService = pruebaService;
     }
 
     @PostMapping(produces = ApplicationConstants.VIEWS_PRODUCE_HTML, params = "BSFOPERADOR")
     public ModelAndView getView(@RequestParam("BSFOPERADOR") String bsfOperadorEncrypt) {
+	System.out.println("Hola" + pruebaService.findAll());
         return mainService.getMain(bsfOperadorEncrypt);
     }
 

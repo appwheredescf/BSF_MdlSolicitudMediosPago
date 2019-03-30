@@ -65,6 +65,12 @@ dependencies {
 	compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.3.4'
 	compile group: 'commons-io', name: 'commons-io', version: '2.4'
 	compile group: 'org.reactivestreams', name: 'reactive-streams', version: '1.0.2'
+	
+	// persistence
+    compile("org.springframework.boot:spring-boot-starter-data-jpa")
+    
+    // driver sqlServer
+    compile (group: 'com.microsoft.sqlserver', name: 'mssql-jdbc', version: '6.2.2.jre8')
 }
 
 bootWar {

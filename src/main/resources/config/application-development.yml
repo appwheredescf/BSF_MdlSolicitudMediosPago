@@ -13,8 +13,8 @@ jboss:
 wso2:
   scheme: http
   esb:
-    host: 172.26.9.65
-    port: 8288
+    host: 192.168.17.90
+    port: 8305
     wsBsfDigitalizacion:
       context-path: /wsBsfDigitalizacion
       identificationImage: ${wso2.scheme}://${wso2.esb.host}:${wso2.esb.port}${wso2.esb.wsBsfDigitalizacion.context-path}/ConsultaDocumentoId
@@ -22,3 +22,20 @@ wso2:
       context-path: /wsBsfOperacionesSucursales
       encrypt: ${wso2.scheme}://${wso2.esb.host}:${wso2.esb.port}${wso2.esb.wsBsfOperacionesSucursales.context-path}/encrypt
       decrypt: ${wso2.scheme}://${wso2.esb.host}:${wso2.esb.port}${wso2.esb.wsBsfOperacionesSucursales.context-path}/decrypt
+
+      
+spring:
+  sqlserver:
+    console:
+      enabled: true
+      path: /sqlserver-console
+  datasource:
+      url: jdbc:sqlserver://172.26.9.103;databaseName=BsfAcnSucursales
+      username: usrBsfWeb
+      password: Bansefi#2016
+      driverClassName: com.microsoft.sqlserver.jdbc.SQLServerDriver
+  jpa:
+    show-sql: true
+    hibernate:
+      dialect: org.hibernate.dialect.SQLServer2012Dialect
+      ddl-auto: none
