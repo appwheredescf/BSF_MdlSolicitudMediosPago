@@ -1,4 +1,4 @@
-package mx.appwhere.mediospago.front.front.appconfig;
+package mx.appwhere.mediospago.front.appconfig;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -21,12 +21,12 @@ public class AbstractDomainEntity<ID extends Serializable> implements DomainEnti
      * Creation date for the entity
      */
     @Column(updatable = false)
-    private LocalDateTime createdOn;
+    private LocalDateTime creadoEn;
 
     /**
      * Last modification date for the entity
      */
-    private LocalDateTime lastUpdated;
+    private LocalDateTime actualizadoEn;
 
     /**
      * Update date fields before persistence
@@ -34,29 +34,28 @@ public class AbstractDomainEntity<ID extends Serializable> implements DomainEnti
     @PreUpdate
     @PrePersist
     public void updateTimeStamps() {
-        lastUpdated = LocalDateTime.now();
-        if (createdOn == null) {
-            createdOn = LocalDateTime.now();
+	actualizadoEn = LocalDateTime.now();
+        if (creadoEn == null) {
+            creadoEn = LocalDateTime.now();
         }
     }
 
-    // setters & getters
-
-//    @Override
+    @Override
     public ID getId() {
         return id;
     }
 
-//    @Override
+    @Override
     public void setId(ID id) {
         this.id = id;
     }
 
-    public LocalDateTime getCreatedOn() {
-        return createdOn;
+    public LocalDateTime getCreadoEn() {
+        return creadoEn;
     }
 
-    public LocalDateTime getLastUpdated() {
-        return lastUpdated;
+    public LocalDateTime getActualizadoEn() {
+        return actualizadoEn;
     }
+
 }

@@ -1,20 +1,29 @@
 package mx.appwhere.mediospago.front.application.controllers.example;
 
+import java.util.List;
+import java.util.Optional;
+
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
 import mx.appwhere.mediospago.front.application.constants.ApplicationConstants;
 import mx.appwhere.mediospago.front.application.controllers.ExceptionController;
 import mx.appwhere.mediospago.front.application.dto.ejemplo.EjemploDto;
 import mx.appwhere.mediospago.front.application.dto.ejemplo.ExampleDto;
-import mx.appwhere.mediospago.front.application.serviceimpl.PruebaServiceImpl;
+import mx.appwhere.mediospago.front.domain.entities.EtlArchivoEntity;
+import mx.appwhere.mediospago.front.domain.entities.EtlProcesoEntity;
 import mx.appwhere.mediospago.front.domain.exceptions.ViewException;
 import mx.appwhere.mediospago.front.domain.exceptions.ajax.FormatException;
+import mx.appwhere.mediospago.front.domain.repositories.EtlProcesoRepository;
 import mx.appwhere.mediospago.front.domain.services.MainService;
-
-import javax.validation.Valid;
 
 @RestController
 @RequestMapping("example")
@@ -22,17 +31,27 @@ public class ExampleController extends ExceptionController {
 
     private MainService mainService;
     
-    private PruebaServiceImpl pruebaService;
+    private EtlProcesoRepository etlProcesoRepository;
+    
 
     @Autowired
-    public ExampleController(MainService mainService, PruebaServiceImpl pruebaService) {
+    public ExampleController(MainService mainService, EtlProcesoRepository etlProcesoRepository) {
         this.mainService = mainService;
-        this.pruebaService = pruebaService;
+        this.etlProcesoRepository = etlProcesoRepository;
     }
 
     @PostMapping(produces = ApplicationConstants.VIEWS_PRODUCE_HTML, params = "BSFOPERADOR")
     public ModelAndView getView(@RequestParam("BSFOPERADOR") String bsfOperadorEncrypt) {
-	System.out.println("Hola" + pruebaService.findAll());
+	
+	Optional<EtlProcesoEntity> etlProcesoOptional = etlProcesoRepository.findByCveProceso("MED");
+	if (etlProcesoOptional.isPresent()) {
+	    EtlProcesoEntity result = etlProcesoOptional.get();
+	    
+	    List<EtlArchivoEntity> listaArchivos = result.getArchivosProceso();
+	    EtlArchivoEntity entyty = listaArchivos.get(0);
+
+	}
+	
         return mainService.getMain(bsfOperadorEncrypt);
     }
 

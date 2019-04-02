@@ -1,4 +1,4 @@
-package mx.appwhere.mediospago.front.front.appconfig;
+package mx.appwhere.mediospago.front.appconfig;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.modelmapper.ModelMapper;
