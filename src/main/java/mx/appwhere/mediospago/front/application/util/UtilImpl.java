@@ -1,18 +1,29 @@
 package mx.appwhere.mediospago.front.application.util;
 
-import com.google.gson.Gson;
+import java.io.File;
+import java.io.IOException;
+import java.text.MessageFormat;
+import java.util.ArrayList;
 
-import mx.appwhere.mediospago.front.domain.util.Util;
-
+import org.apache.commons.io.FileUtils;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
+import com.google.gson.Gson;
+
+import mx.appwhere.mediospago.front.application.constants.ApplicationConstants;
+import mx.appwhere.mediospago.front.application.dto.ResGralDto;
+import mx.appwhere.mediospago.front.application.scheduled.MediosPagoScheduled;
+import mx.appwhere.mediospago.front.domain.util.Util;
 
 @Component
 public class UtilImpl<T> implements Util<T> {
+    
+    private static final Logger LOGGER = LoggerFactory.getLogger(MediosPagoScheduled.class);
 
     /**
      * Metodo utilitario para convertir un json a un objeto.
@@ -72,5 +83,24 @@ public class UtilImpl<T> implements Util<T> {
 	Gson gson = new Gson();
 	return gson.toJson(object);
     }
+    
+    @Override
+    public void clearDirectory(String pathDirectory) {
+	try {
+	    FileUtils.cleanDirectory(new File(pathDirectory));
+	} catch (IOException e) {
+	    LOGGER.error("Error al vaciar directorio {}", pathDirectory, e);
+	}
+    }
 
+    @Override
+    public ResGralDto crearErrorDto(String message, Object... args) {
+
+	String messageFormat = new MessageFormat(message).format(args);
+
+	ResGralDto responseError = new ResGralDto();
+	responseError.setEstatus(ApplicationConstants.ERR);
+	responseError.setMensaje(messageFormat);
+	return responseError;
+    }
 }

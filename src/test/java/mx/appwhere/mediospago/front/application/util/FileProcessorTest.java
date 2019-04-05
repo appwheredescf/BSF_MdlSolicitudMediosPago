@@ -9,6 +9,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import mx.appwhere.mediospago.front.application.dto.etl.EtlArchivoDto;
+
 @RunWith(SpringRunner.class)
 public class FileProcessorTest {
     
@@ -22,7 +24,7 @@ public class FileProcessorTest {
     public void readLine() throws IOException { 
 	File file =  loadFile(); 
 	if (file.exists()) {
-	    FileProcessor fileProcessor = new FileProcessor(file);
+	    FileProcessor fileProcessor = new FileProcessor(file, new EtlArchivoDto());
 	    
 	    assertThat(fileProcessor.getNextLine()).isNotBlank();
 	    fileProcessor.close();
@@ -33,7 +35,7 @@ public class FileProcessorTest {
     public void closeFile() throws IOException { 
 	File file =  loadFile(); 
 	if (file.exists()) {
-	    FileProcessor fileProcessor = new FileProcessor(file);
+	    FileProcessor fileProcessor = new FileProcessor(file, new EtlArchivoDto());
 	    fileProcessor.close();
 	    
 	    assertThat(fileProcessor.getNextLine()).isNull();

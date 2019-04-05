@@ -39,3 +39,6 @@ spring:
     hibernate:
       dialect: org.hibernate.dialect.SQLServer2012Dialect
       ddl-auto: none
+      
+temporal:
+  path: C:\ETL

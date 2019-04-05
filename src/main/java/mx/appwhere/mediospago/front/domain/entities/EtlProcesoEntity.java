@@ -3,8 +3,11 @@ package mx.appwhere.mediospago.front.domain.entities;
 import java.util.List;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
 import javax.persistence.Table;
 
 /**
@@ -22,15 +25,18 @@ public class EtlProcesoEntity extends AbstractDomainEntity<Long> {
     
     private String nombreProceso;
     
-    private String ftpIpServidor;
-    
-    private String ftpPuerto;
-    
-    private String ftpPassword;
-    
-    @OneToMany
+    @OrderBy("orden asc")
+    @OneToMany(fetch = FetchType.EAGER)
     @JoinColumn(name = "idProceso", insertable = false, updatable = false)
     private List<EtlArchivoEntity> archivosProceso;
+    
+    @ManyToOne
+    @JoinColumn(name = "idConfiguracionFtpEntrada", insertable = false, updatable = false)
+    private EtlConfiguracionFtpEntity configuracionFtpEntrada;
+    
+    @ManyToOne
+    @JoinColumn(name = "idConfiguracionFtpSalida", insertable = false, updatable = false)
+    private EtlConfiguracionFtpEntity configuracionFtpSalida;
 
     public String getCveProceso() {
         return cveProceso;
@@ -48,30 +54,6 @@ public class EtlProcesoEntity extends AbstractDomainEntity<Long> {
         this.nombreProceso = nombreProceso;
     }
 
-    public String getFtpIpServidor() {
-        return ftpIpServidor;
-    }
-
-    public void setFtpIpServidor(String ftpIpServidor) {
-        this.ftpIpServidor = ftpIpServidor;
-    }
-
-    public String getFtpPuerto() {
-        return ftpPuerto;
-    }
-
-    public void setFtpPuerto(String ftpPuerto) {
-        this.ftpPuerto = ftpPuerto;
-    }
-
-    public String getFtpPassword() {
-        return ftpPassword;
-    }
-
-    public void setFtpPassword(String ftpPassword) {
-        this.ftpPassword = ftpPassword;
-    }
-
     public List<EtlArchivoEntity> getArchivosProceso() {
         return archivosProceso;
     }
@@ -79,5 +61,20 @@ public class EtlProcesoEntity extends AbstractDomainEntity<Long> {
     public void setArchivosProceso(List<EtlArchivoEntity> archivosProceso) {
         this.archivosProceso = archivosProceso;
     }
-    
+
+    public EtlConfiguracionFtpEntity getConfiguracionFtpEntrada() {
+        return configuracionFtpEntrada;
+    }
+
+    public void setConfiguracionFtpEntrada(EtlConfiguracionFtpEntity configuracionFtpEntrada) {
+        this.configuracionFtpEntrada = configuracionFtpEntrada;
+    }
+
+    public EtlConfiguracionFtpEntity getConfiguracionFtpSalida() {
+        return configuracionFtpSalida;
+    }
+
+    public void setConfiguracionFtpSalida(EtlConfiguracionFtpEntity configuracionFtpSalida) {
+        this.configuracionFtpSalida = configuracionFtpSalida;
+    }
 }

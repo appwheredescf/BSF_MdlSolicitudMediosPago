@@ -1,6 +1,8 @@
 package mx.appwhere.mediospago.front.domain.entities;
 
 import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 
@@ -17,17 +19,20 @@ public class EtlCamposArchivoEntity extends AbstractDomainEntity<Long> {
     
     private Long idArchivo;
     
-    
-    private EtlCatCamposArchivoEntity campoArchivo;
-    
     private Integer posicionInicial;
     
     private Integer posicionFinal;
     
     private Boolean obligatorio;
     
-    private String tipoDato;
-
+    @ManyToOne
+    @JoinColumn(name = "idCampoArchivo", insertable = false, updatable = false)
+    private EtlCatCamposArchivoEntity campoArchivo;
+    
+    @ManyToOne
+    @JoinColumn(name = "idTipoDato", insertable = false, updatable = false)
+    private EtlCatTipoDatoEntity catTipoDato;
+    
     public Long getIdArchivo() {
         return idArchivo;
     }
@@ -68,11 +73,11 @@ public class EtlCamposArchivoEntity extends AbstractDomainEntity<Long> {
         this.obligatorio = obligatorio;
     }
 
-    public String getTipoDato() {
-        return tipoDato;
+    public EtlCatTipoDatoEntity getCatTipoDato() {
+        return catTipoDato;
     }
 
-    public void setTipoDato(String tipoDato) {
-        this.tipoDato = tipoDato;
+    public void setCatTipoDato(EtlCatTipoDatoEntity catTipoDato) {
+        this.catTipoDato = catTipoDato;
     }
 }

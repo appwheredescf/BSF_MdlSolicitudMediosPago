@@ -1,19 +1,41 @@
 package mx.appwhere.mediospago.front.application.constants;
 
+import lombok.experimental.UtilityClass;
+
 /**
  * @author Alejandro Martin
  * @version 1.0 - 2017/10/13
  */
+
+@UtilityClass
 public final class ApplicationConstants {
+    
     public static final String VIEW_MESSAGE_NAME = "message";
     public static final String VIEWS_PRODUCE_HTML = "text/html; charset=UTF-8";
     public static final String FORMATO_NUMERO_MUY_LARGO = "Introduce un numero mas corto";
 
-    //Mesnajes de error de validación
+    //Mensajes de error de validación
     public static final String NULL_MESSAGE = "No debe estar vacio";
     public static final String LENGTH_MESSAGE = "El tamaño debe estar entre {min} y {max}";
     public static final String MIN_MESSAGE = "El valor no debe ser menor a {value}";
     public static final String MAX_MESSAGE = "El valor no debe de superar a {value}";
     public static final String DIGITS_MESSAGE = "El valor no debe tener más de {integer} digitos y {fraction} decimales";
     public static final String SELECT_OPTION_MESSAGE = "Selecciona una opción valida";
+    
+    public static final String ETL_ERR_NOMBRE_ARCHIVO = "Error en nombre de archivo: {0}";
+    public static final String ETL_ERR_LECTURA_ARCHIVO = "Error en la lectura del archivo: {0}";
+    public static final String ETL_ERR_REGISTROS_ARCHIVO = "El Archivo: {0}, debe contener unicamente: {1} registros";
+    public static final String ETL_ERR_LONGITUD_LINEA = "Error en longitud de la linea: {0} de archivo: {1}";
+    public static final String ETL_ERR_LINEAS_AP = "El archivo A_P, no contiene las lineas descritas en archivo C_C";
+    
+    public static final String TIPO_ARCHIVO_CIFRAS_CONTROL = "C_C";
+    public static final String TIPO_ARCHIVO_CPRINCIPAL = "A_P";
+    
+    public static final String CVE_PROCESO_MEDIOS_PAGO = "MED";
+    
+    public static final int OK  = 1;
+    public static final int ERR = 0;
+    
+    /** Definicion de indices de campos de archivos */
+    public static final int[] CC_CAMPO_TOTAL_REGISTROS = new int[] {8, 13};
 }
