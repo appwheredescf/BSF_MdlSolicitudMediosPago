@@ -11,4 +11,6 @@ public interface Util<T> {
     String objectToJson(Object object);
     void clearDirectory(String pathDirectory);
     ResGralDto crearErrorDto(String message, Object... args);
+    public boolean hasSpecialCharacters(String strValue);
+    
 }

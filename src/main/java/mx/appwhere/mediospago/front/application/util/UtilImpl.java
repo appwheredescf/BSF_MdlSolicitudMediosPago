@@ -103,4 +103,9 @@ public class UtilImpl<T> implements Util<T> {
 	responseError.setMensaje(messageFormat);
 	return responseError;
     }
+    
+    @Override
+    public boolean hasSpecialCharacters(String strValue) {
+	return !strValue.matches("^[A-Z0-9_-]*$");
+    }
 }

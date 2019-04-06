@@ -12,6 +12,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import mx.appwhere.mediospago.front.application.constants.ApplicationConstants;
 import mx.appwhere.mediospago.front.application.dto.ResGralDto;
@@ -124,16 +125,39 @@ public class ValidadorArchivoServiceImpl implements ValidadorArchivoService {
 	
 	if (archivoDto.getLongitudLinea() == registro.length()) {
 	    
-	    archivoDto.getListaCampos().forEach(campoArchivoDto -> {
-		String campo = obtenerCampo(registro,  campoArchivoDto); 
-		
-	    });
+	    if(!util.hasSpecialCharacters(registro)) {
+		archivoDto.getListaCampos().forEach(campoArchivoDto -> {
+		    String campo = obtenerCampo(registro,  campoArchivoDto); 
+		    validarCampoArchivo(campoArchivoDto, campo, nregistro, archivoDto.getExtension());
+        	});
+	    } else {
+		lstErrores.add(util.crearErrorDto(ApplicationConstants.ETL_ERR_CARACTERES_ESP, nregistro, archivoDto.getExtension()));
+	    }
 	} else {
 	    lstErrores.add(util.crearErrorDto(ApplicationConstants.ETL_ERR_LONGITUD_LINEA, nregistro, archivoDto.getExtension()));
 	}
 	
 	return lstErrores;
     }
+    
+    private ResGralDto validarCampoArchivo(EtlCampoArchivoDto campoArchivoDto, String registro, int numeroRegistro, String tipoArchivo) {
+	
+	ResGralDto resGralDto = new ResGralDto();
+	
+	registro = registro.trim();
+	
+	if (StringUtils.isEmpty(registro)) {
+	    util.crearErrorDto(ApplicationConstants.ETL_ERR_CAMPO_VACIO, campoArchivoDto.getNombreCampo(), numeroRegistro, tipoArchivo);
+	} else if (campoArchivoDto.getTipoDato().equals(ApplicationConstants.TIPO_DATO_CADENA)) {
+
+	} else if (campoArchivoDto.getTipoDato().equals(ApplicationConstants.TIPO_DATO_NUMERICO)) {
+
+	} else if (campoArchivoDto.getTipoDato().equals(ApplicationConstants.TIPO_DATO_FECHA)) {
+
+	}
+	return resGralDto;
+    }
+    
     
     private String obtenerCampo(String registro, EtlCampoArchivoDto campoArchivoDto) {
 	return registro.substring(campoArchivoDto.getPosicionInicial() - 1, campoArchivoDto.getPosicionFinal());
@@ -142,4 +166,6 @@ public class ValidadorArchivoServiceImpl implements ValidadorArchivoService {
     private String obtenerCampo(String registro, int... indices) {
    	return registro.substring(indices[0] - 1, indices[1]);
     }
+    
+    
 }

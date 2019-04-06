@@ -106,7 +106,7 @@ public class MediosPagoScheduled {
 	    
 	    /** Si no existen errores */
 	    if (lstErroresDto.isEmpty()) {
-		LOGGER.info("Todo sin errores");
+
 	    }
 	    
 	} 
