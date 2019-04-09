@@ -29,6 +29,10 @@ public final class ApplicationConstants {
     public static final String ETL_ERR_LINEAS_AP = "El archivo A_P, no contiene las lineas descritas en archivo C_C";
     public static final String ETL_ERR_CAMPO_VACIO = "El campo: {0}, de la linea: {1}, del archivo: {2}, no debe ser vacio";
     public static final String ETL_ERR_CARACTERES_ESP = "Se encontraron caracteres especiales en linea: {0} de archivo: {1}";
+    public static final String ETL_ERR_CAMPO_NUMERICO = "El campo: {0}, de la linea: {1}, del archivo: {2}, debe contener solo valores numéricos";
+    public static final String ETL_ERR_CAMPO_FECHA = "El campo: {0}, de la linea: {1}, del archivo: {2}, debe contener formato DDMMAAAA";
+    public static final String ETL_ERR_VALOR_DEFAULT = "El valor del campo: {0}, de la linea: {1}, del archivo: {2}, debe ser: {3}";
+    
     
     public static final String TIPO_ARCHIVO_CIFRAS_CONTROL = "C_C";
     public static final String TIPO_ARCHIVO_CPRINCIPAL = "A_P";

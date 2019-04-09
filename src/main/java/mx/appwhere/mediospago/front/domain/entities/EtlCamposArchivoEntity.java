@@ -25,6 +25,8 @@ public class EtlCamposArchivoEntity extends AbstractDomainEntity<Long> {
     
     private Boolean obligatorio;
     
+    private String valorDefault;
+    
     @ManyToOne
     @JoinColumn(name = "idCampoArchivo", insertable = false, updatable = false)
     private EtlCatCamposArchivoEntity campoArchivo;
@@ -79,5 +81,13 @@ public class EtlCamposArchivoEntity extends AbstractDomainEntity<Long> {
 
     public void setCatTipoDato(EtlCatTipoDatoEntity catTipoDato) {
         this.catTipoDato = catTipoDato;
+    }
+
+    public String getValorDefault() {
+        return valorDefault;
+    }
+
+    public void setValorDefault(String valorDefault) {
+        this.valorDefault = valorDefault;
     }
 }

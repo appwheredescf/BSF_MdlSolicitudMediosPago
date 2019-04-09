@@ -25,4 +25,6 @@ public class EtlCampoArchivoDto {
     private String nombreCampo;
     
     private String descripcion;
+    
+    private String valorDefault;
 }

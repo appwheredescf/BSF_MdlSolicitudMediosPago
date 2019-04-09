@@ -20,23 +20,23 @@ public class EtlCamposArchivoConverter {
 
     public static EtlCampoArchivoDto convert(EtlCamposArchivoEntity source) {
 	
-	EtlCampoArchivoDto target = new EtlCampoArchivoDto();
-	target.setId(source.getId());
-	target.setIdArchivo(source.getIdArchivo());
-	target.setObligatorio(source.getObligatorio());
-	target.setPosicionFinal(source.getPosicionFinal());
-	target.setPosicionInicial(source.getPosicionInicial());
-	target.setTipoDato(source.getCatTipoDato().getTipoDato());
-	if (Objects.nonNull(source.getCampoArchivo())) {
-	    target.setDescripcion(source.getCampoArchivo().getDescripcion());
-	    target.setNombreCampo(source.getCampoArchivo().getNombreCampo());
-	}
-	return target;
+		EtlCampoArchivoDto target = new EtlCampoArchivoDto();
+		target.setId(source.getId());
+		target.setIdArchivo(source.getIdArchivo());
+		target.setObligatorio(source.getObligatorio());
+		target.setPosicionFinal(source.getPosicionFinal());
+		target.setPosicionInicial(source.getPosicionInicial());
+		target.setTipoDato(source.getCatTipoDato().getTipoDato());
+		target.setValorDefault(source.getValorDefault());
+		if (Objects.nonNull(source.getCampoArchivo())) {
+		    target.setNombreCampo(source.getCampoArchivo().getNombreCampo());
+		}
+		return target;
     }
     
     public static List<EtlCampoArchivoDto> convert(List<EtlCamposArchivoEntity> listSource) {
-	List<EtlCampoArchivoDto> listTarget = new ArrayList<>();
-	listSource.forEach(element -> listTarget.add(convert(element)));
-	return listTarget;
+		List<EtlCampoArchivoDto> listTarget = new ArrayList<>();
+		listSource.forEach(element -> listTarget.add(convert(element)));
+		return listTarget;
     }
 }

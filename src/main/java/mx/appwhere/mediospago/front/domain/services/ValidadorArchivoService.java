@@ -12,4 +12,7 @@ public interface ValidadorArchivoService {
     
     List<ResGralDto> validarCifrasControl (Map<String, FileProcessor> mapFileProcess);
     
+    List<ResGralDto> validarArchivoPrincipal (Map<String, FileProcessor> mapFileProcess);
+    
+    
 }

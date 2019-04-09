@@ -37,135 +37,179 @@ public class ValidadorArchivoServiceImpl implements ValidadorArchivoService {
     private Util<?> util;
     
     public ValidadorArchivoServiceImpl(Util<?> util) {
-	this.util = util;
+    	this.util = util;
     }
     
     public List<ResGralDto> validarNombresArchivos(Map<String, FileProcessor> mapFileProcess, String cveProceso) {
 	
-	List<ResGralDto> lstErrores = new ArrayList<>();
-	mapFileProcess.forEach((key, fileProcessor) -> {
-	    
-	    if (!validarNombreArchivo (fileProcessor.getFile().getName(), cveProceso, fileProcessor.getArchivoDto().getExtension())) {
-		lstErrores.add(util.crearErrorDto(ApplicationConstants.ETL_ERR_NOMBRE_ARCHIVO, fileProcessor.getArchivoDto().getExtension()));
-	    }
-	});
+		List<ResGralDto> lstErrores = new ArrayList<>();
+		mapFileProcess.forEach((key, fileProcessor) -> {
+		    
+		    if (!validarNombreArchivo (fileProcessor.getFile().getName(), cveProceso, fileProcessor.getArchivoDto().getExtension())) {
+		    	lstErrores.add(util.crearErrorDto(ApplicationConstants.ETL_ERR_NOMBRE_ARCHIVO, fileProcessor.getArchivoDto().getExtension()));
+		    }
+		});
     
     	return lstErrores;
     }
 
     private boolean validarNombreArchivo (String fileName, String cveProceso, String extension) {
 	
-	boolean isValid = Boolean.FALSE;
-	
-	if (cveProceso.equals(CVE_PROCESO_MEDIOS_PAGO)) {
-	    
-	    if (extension.equals("xls") ) {
-		isValid = Boolean.TRUE;
-	    } else if (fileName.length() == 35) {
+		boolean isValid = Boolean.FALSE;
 		
-		String expectedName = CVE_PROCESO_MEDIOS_PAGO + "_" + "SOL_CTA_TAR_TCXXXXX_MB01_02." + extension;
-		String informacionAdicional = fileName.substring(18, 23);
-		expectedName = expectedName.replace("XXXXX", informacionAdicional);
+		if (cveProceso.equals(CVE_PROCESO_MEDIOS_PAGO)) {
+		    
+		    if (extension.equals("xls") ) {
+		    	isValid = Boolean.TRUE;
+		    } else if (fileName.length() == 35) {
+			
+				String expectedName = CVE_PROCESO_MEDIOS_PAGO + "_" + "SOL_CTA_TAR_TCXXXXX_MB01_02." + extension;
+				String informacionAdicional = fileName.substring(18, 23);
+				expectedName = expectedName.replace("XXXXX", informacionAdicional);
+			
+				if (expectedName.equals(fileName)) {
+				    isValid = Boolean.TRUE;
+				}		
+		    }
+		}
 		
-		if (expectedName.equals(fileName)) {
-		    isValid = Boolean.TRUE;
-		}		
-	    }
-	}
-	
-	return isValid;
+		return isValid;
     }
     
     public List<ResGralDto> validarCifrasControl (Map<String, FileProcessor> mapFileProcess) {
 	
-	List<ResGralDto> lstErrores = new ArrayList<>();
-	
-	FileProcessor cifrasControlFile = mapFileProcess.get(TIPO_ARCHIVO_CIFRAS_CONTROL);
-	
-	try {
-	    cifrasControlFile.open();
-	    
-	    if (cifrasControlFile.hasNext()) {
+		List<ResGralDto> lstErrores = new ArrayList<>();
 		
-		String registro = cifrasControlFile.getNextLine();
+		FileProcessor cifrasControlFile = mapFileProcess.get(TIPO_ARCHIVO_CIFRAS_CONTROL);
 		
-		lstErrores.addAll(validarCamposArchivo(registro, cifrasControlFile.getCurrentLine(), cifrasControlFile.getArchivoDto())); 
-		
-		if (cifrasControlFile.hasNext()) {
-		    lstErrores.add(util.crearErrorDto(ApplicationConstants.ETL_ERR_REGISTROS_ARCHIVO, cifrasControlFile.getFile().getName(), 1));
-		}
-		
-		/** Si no existen errores, verificamos que el archivo AP, contenga las lineas mencionadas en CC*/
-		if (lstErrores.isEmpty()) {
+		try {
+		    cifrasControlFile.open();
 		    
-		    FileProcessor archivoPrincipalFile = mapFileProcess.get(TIPO_ARCHIVO_CPRINCIPAL);
-
-		    long cantidadRegistrosAP = archivoPrincipalFile.countLines();
-		    long cantidadRegistrosCC = Long.parseLong(obtenerCampo(registro, ApplicationConstants.CC_CAMPO_TOTAL_REGISTROS));
-		    
-		    if (cantidadRegistrosAP != cantidadRegistrosCC) {
-			lstErrores.add(util.crearErrorDto(ApplicationConstants.ETL_ERR_LINEAS_AP));
+		    if (cifrasControlFile.hasNext()) {
+			
+				String registro = cifrasControlFile.getNextLine();
+				
+				LOGGER.info("Archivo CIfras Control");
+				lstErrores.addAll(validarCamposArchivo(registro, cifrasControlFile.getCurrentLine(), cifrasControlFile.getArchivoDto())); 
+				
+				if (cifrasControlFile.hasNext()) {
+				    lstErrores.add(util.crearErrorDto(ApplicationConstants.ETL_ERR_REGISTROS_ARCHIVO, cifrasControlFile.getFile().getName(), 1));
+				}
+				
+				/** Si no existen errores, verificamos que el archivo AP, contenga las lineas mencionadas en CC*/
+				if (lstErrores.isEmpty()) {
+				    
+				    FileProcessor archivoPrincipalFile = mapFileProcess.get(TIPO_ARCHIVO_CPRINCIPAL);
+		
+				    long cantidadRegistrosAP = archivoPrincipalFile.countLines();
+				    long cantidadRegistrosCC = Long.parseLong(obtenerCampo(registro, ApplicationConstants.CC_CAMPO_TOTAL_REGISTROS));
+				    
+				    if (cantidadRegistrosAP != cantidadRegistrosCC) {
+				    	lstErrores.add(util.crearErrorDto(ApplicationConstants.ETL_ERR_LINEAS_AP));
+				    }
+				}
 		    }
+		    
+		    cifrasControlFile.close();
+		    
+		} catch (IOException e) {
+		    LOGGER.info(e.getMessage(), e);
+		    lstErrores.add(util.crearErrorDto(ApplicationConstants.ETL_ERR_LECTURA_ARCHIVO, cifrasControlFile.getFile().getName()));
 		}
-	    }
-	    
-	    cifrasControlFile.close();
-	    
-	} catch (IOException e) {
-	    LOGGER.info(e.getMessage(), e);
-	    lstErrores.add(util.crearErrorDto(ApplicationConstants.ETL_ERR_LECTURA_ARCHIVO, cifrasControlFile.getFile().getName()));
-	}
-	
-	return lstErrores;
+		
+		return lstErrores;
     }
     
     private List<ResGralDto> validarCamposArchivo(String registro, int nregistro,  EtlArchivoDto archivoDto) {
 	
-	List<ResGralDto> lstErrores = new ArrayList<>();
-	
-	if (archivoDto.getLongitudLinea() == registro.length()) {
-	    
-	    if(!util.hasSpecialCharacters(registro)) {
-		archivoDto.getListaCampos().forEach(campoArchivoDto -> {
-		    String campo = obtenerCampo(registro,  campoArchivoDto); 
-		    validarCampoArchivo(campoArchivoDto, campo, nregistro, archivoDto.getExtension());
-        	});
-	    } else {
-		lstErrores.add(util.crearErrorDto(ApplicationConstants.ETL_ERR_CARACTERES_ESP, nregistro, archivoDto.getExtension()));
-	    }
-	} else {
-	    lstErrores.add(util.crearErrorDto(ApplicationConstants.ETL_ERR_LONGITUD_LINEA, nregistro, archivoDto.getExtension()));
-	}
-	
-	return lstErrores;
+		List<ResGralDto> lstErrores = new ArrayList<>();
+		
+		LOGGER.info("Registro:" + registro);
+		
+		if (archivoDto.getLongitudLinea() == registro.length()) {
+		    
+		    if(!util.hasSpecialCharacters(registro)) {
+				archivoDto.getListaCampos().forEach(campoArchivoDto -> {
+					
+				    String campo = obtenerCampo(registro,  campoArchivoDto); 
+				    
+					LOGGER.info("Campo:" + campoArchivoDto.getNombreCampo() + " Valor: " + campo);
+				    
+					ResGralDto resGralDto = validarCampoArchivo(campoArchivoDto, campo, nregistro, archivoDto.getExtension());
+				    if (resGralDto.getEstatus() == ApplicationConstants.ERR) {
+				    	lstErrores.add(resGralDto);
+				    }
+		        });
+		    } else {
+				lstErrores.add(util.crearErrorDto(ApplicationConstants.ETL_ERR_CARACTERES_ESP, nregistro, archivoDto.getExtension()));
+		    }
+		} else {
+		    lstErrores.add(util.crearErrorDto(ApplicationConstants.ETL_ERR_LONGITUD_LINEA, nregistro, archivoDto.getExtension()));
+		}
+		
+		return lstErrores;
     }
     
     private ResGralDto validarCampoArchivo(EtlCampoArchivoDto campoArchivoDto, String registro, int numeroRegistro, String tipoArchivo) {
 	
-	ResGralDto resGralDto = new ResGralDto();
-	
-	registro = registro.trim();
-	
-	if (StringUtils.isEmpty(registro)) {
-	    util.crearErrorDto(ApplicationConstants.ETL_ERR_CAMPO_VACIO, campoArchivoDto.getNombreCampo(), numeroRegistro, tipoArchivo);
-	} else if (campoArchivoDto.getTipoDato().equals(ApplicationConstants.TIPO_DATO_CADENA)) {
-
-	} else if (campoArchivoDto.getTipoDato().equals(ApplicationConstants.TIPO_DATO_NUMERICO)) {
-
-	} else if (campoArchivoDto.getTipoDato().equals(ApplicationConstants.TIPO_DATO_FECHA)) {
-
-	}
-	return resGralDto;
+		ResGralDto resGralDto = new ResGralDto();
+		
+		registro = registro.trim();
+		
+		if (StringUtils.isEmpty(registro) && campoArchivoDto.getObligatorio()) {
+		    resGralDto = util.crearErrorDto(ApplicationConstants.ETL_ERR_CAMPO_VACIO, campoArchivoDto.getNombreCampo(), numeroRegistro, tipoArchivo);
+		} else if (campoArchivoDto.getTipoDato().equals(ApplicationConstants.TIPO_DATO_NUMERICO)  && !util.isNumeric(registro)) {
+		    resGralDto = util.crearErrorDto(ApplicationConstants.ETL_ERR_CAMPO_NUMERICO, campoArchivoDto.getNombreCampo(), numeroRegistro, tipoArchivo);
+		} else if (campoArchivoDto.getTipoDato().equals(ApplicationConstants.TIPO_DATO_FECHA)  && !util.isDateValid(registro)) {
+		    resGralDto = util.crearErrorDto(ApplicationConstants.ETL_ERR_CAMPO_FECHA, campoArchivoDto.getNombreCampo(), numeroRegistro, tipoArchivo);
+		} else {
+		    resGralDto.setEstatus(ApplicationConstants.OK);
+		}
+		
+		/** Validamos si el campo debe tener cierto valor por defecto **/
+		if (resGralDto.getEstatus() == ApplicationConstants.OK && campoArchivoDto.getValorDefault() != null
+			&& !campoArchivoDto.getValorDefault().equals(registro)) {
+		    
+		    resGralDto = util.crearErrorDto(ApplicationConstants.ETL_ERR_VALOR_DEFAULT,
+			    campoArchivoDto.getNombreCampo(), numeroRegistro, tipoArchivo, campoArchivoDto.getValorDefault());
+		}
+		
+		return resGralDto;
     }
     
     
     private String obtenerCampo(String registro, EtlCampoArchivoDto campoArchivoDto) {
-	return registro.substring(campoArchivoDto.getPosicionInicial() - 1, campoArchivoDto.getPosicionFinal());
+    	return registro.substring(campoArchivoDto.getPosicionInicial() - 1, campoArchivoDto.getPosicionFinal());
     }
     
     private String obtenerCampo(String registro, int... indices) {
-   	return registro.substring(indices[0] - 1, indices[1]);
+    	return registro.substring(indices[0] - 1, indices[1]);
     }
-    
-    
+
+    @Override
+    public List<ResGralDto> validarArchivoPrincipal(Map<String, FileProcessor> mapFileProcess) {
+	
+		List<ResGralDto> lstErrores = new ArrayList<>();
+		
+		FileProcessor archivoPrincipal = mapFileProcess.get(TIPO_ARCHIVO_CPRINCIPAL);
+		
+		try {
+		    archivoPrincipal.open();
+
+		    LOGGER.info("Archivo Principal");
+		    String registro;
+		    while (archivoPrincipal.hasNext() && lstErrores.isEmpty()) {
+				registro = archivoPrincipal.getNextLine();
+				lstErrores.addAll(validarCamposArchivo(registro, archivoPrincipal.getCurrentLine(), archivoPrincipal.getArchivoDto()));
+		    }
+		
+		    archivoPrincipal.close();
+		    
+    	} catch (IOException e) {
+		    LOGGER.info(e.getMessage(), e);
+		    lstErrores.add(util.crearErrorDto(ApplicationConstants.ETL_ERR_LECTURA_ARCHIVO, archivoPrincipal.getFile().getName()));
+		}
+		
+		return lstErrores;
+    }
 }
