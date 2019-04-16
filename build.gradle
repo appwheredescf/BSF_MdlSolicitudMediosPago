@@ -66,7 +66,16 @@ dependencies {
 	compile group: 'commons-io', name: 'commons-io', version: '2.4'
 	compile group: 'org.reactivestreams', name: 'reactive-streams', version: '1.0.2'	
 	compile group: 'commons-net', name: 'commons-net', version: '3.6'
-	
+
+
+	compile group: 'org.apache.poi', name: 'poi', version: '4.0.1'
+	//compile group: 'org.apache.poi', name: 'poi', version: '3.17'
+	//compile group: 'org.apache.poi', name: 'poi-ooxml', version: '3.17'
+
+	// https://mvnrepository.com/artifact/org.apache.poi/openxml4j
+	compile group: 'org.apache.poi', name: 'openxml4j', version: '1.0-beta'
+
+
 	// persistence
     compile("org.springframework.boot:spring-boot-starter-data-jpa")
     

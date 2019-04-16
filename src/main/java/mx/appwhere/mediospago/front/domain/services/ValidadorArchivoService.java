@@ -1,5 +1,6 @@
 package mx.appwhere.mediospago.front.domain.services;
 
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 
@@ -10,9 +11,8 @@ public interface ValidadorArchivoService {
 
     List<ResGralDto> validarNombresArchivos(Map<String, FileProcessor> lstFileProcess, String cveProceso);
     
-    List<ResGralDto> validarCifrasControl (Map<String, FileProcessor> mapFileProcess);
+    List<ResGralDto> validarCifrasControl (Map<String, FileProcessor> mapFileProcess, Long nRegistrosAP);
     
-    List<ResGralDto> validarArchivoPrincipal (Map<String, FileProcessor> mapFileProcess);
-    
+    List<ResGralDto> validarArchivoPrincipalGenerarSalida (Map<String, FileProcessor> mapFileProcess, File tempDirectory);
     
 }

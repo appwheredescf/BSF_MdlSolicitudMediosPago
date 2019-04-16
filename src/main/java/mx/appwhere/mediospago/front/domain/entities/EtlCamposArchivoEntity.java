@@ -26,10 +26,20 @@ public class EtlCamposArchivoEntity extends AbstractDomainEntity<Long> {
     private Boolean obligatorio;
     
     private String valorDefault;
-    
+
+    private Integer numeroCampo;
+
     @ManyToOne
     @JoinColumn(name = "idCampoArchivo", insertable = false, updatable = false)
+    private EtlCamposArchivoEntity valorCampoArchivo;
+
+    @ManyToOne
+    @JoinColumn(name = "idCatCampoArchivo", insertable = false, updatable = false)
     private EtlCatCamposArchivoEntity campoArchivo;
+
+    @ManyToOne
+    @JoinColumn(name = "idCatTipoRelleno", insertable = false, updatable = false)
+    private EtlCatTipoRellenoEntity tipoRelleno;
     
     @ManyToOne
     @JoinColumn(name = "idTipoDato", insertable = false, updatable = false)
@@ -89,5 +99,29 @@ public class EtlCamposArchivoEntity extends AbstractDomainEntity<Long> {
 
     public void setValorDefault(String valorDefault) {
         this.valorDefault = valorDefault;
+    }
+
+    public EtlCamposArchivoEntity getValorCampoArchivo() {
+        return valorCampoArchivo;
+    }
+
+    public void setValorCampoArchivo(EtlCamposArchivoEntity valorCampoArchivo) {
+        this.valorCampoArchivo = valorCampoArchivo;
+    }
+
+    public EtlCatTipoRellenoEntity getTipoRelleno() {
+        return tipoRelleno;
+    }
+
+    public void setTipoRelleno(EtlCatTipoRellenoEntity tipoRelleno) {
+        this.tipoRelleno = tipoRelleno;
+    }
+
+    public Integer getNumeroCampo() {
+        return numeroCampo;
+    }
+
+    public void setNumeroCampo(Integer numeroCampo) {
+        this.numeroCampo = numeroCampo;
     }
 }

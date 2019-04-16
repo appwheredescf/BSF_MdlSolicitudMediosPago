@@ -15,8 +15,7 @@ import mx.appwhere.mediospago.front.application.dto.etl.EtlArchivoDto;
 public class FileProcessorTest {
     
     
-    private File loadFile() {
-	return new File("C:\\MEDIOS_PAGO\\MED_SOL_CTA_TAR_TC19209_MB02_04.A_P"); 
+    private File loadFile() { return new File("C:\\MEDIOS_PAGO\\MED_SOL_CTA_TAR_TC19209_MB02_04.A_P");
     }
     
     
@@ -24,10 +23,12 @@ public class FileProcessorTest {
     public void readLine() throws IOException { 
 	File file =  loadFile(); 
 	if (file.exists()) {
-	    FileProcessor fileProcessor = new FileProcessor(file, new EtlArchivoDto());
+	    InFileProcessor inFileProcessor = new InFileProcessor(file, new EtlArchivoDto());
+
+		inFileProcessor.open();
 	    
-	    assertThat(fileProcessor.getNextLine()).isNotBlank();
-	    fileProcessor.close();
+	    assertThat(inFileProcessor.getNextLine()).isNotBlank();
+	    inFileProcessor.close();
 	}
     }
     
@@ -35,10 +36,10 @@ public class FileProcessorTest {
     public void closeFile() throws IOException { 
 	File file =  loadFile(); 
 	if (file.exists()) {
-	    FileProcessor fileProcessor = new FileProcessor(file, new EtlArchivoDto());
-	    fileProcessor.close();
+	    InFileProcessor inFileProcessor = new InFileProcessor(file, new EtlArchivoDto());
+	    inFileProcessor.close();
 	    
-	    assertThat(fileProcessor.getNextLine()).isNull();
+	    assertThat(inFileProcessor.getNextLine()).isNull();
 	}
     }
 }

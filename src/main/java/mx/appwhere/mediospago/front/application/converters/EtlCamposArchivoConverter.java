@@ -28,8 +28,15 @@ public class EtlCamposArchivoConverter {
 		target.setPosicionInicial(source.getPosicionInicial());
 		target.setTipoDato(source.getCatTipoDato().getTipoDato());
 		target.setValorDefault(source.getValorDefault());
+		target.setNumeroCampo(source.getNumeroCampo());
 		if (Objects.nonNull(source.getCampoArchivo())) {
 		    target.setNombreCampo(source.getCampoArchivo().getNombreCampo());
+		}
+		if (source.getValorCampoArchivo() != null) {
+			target.setValorCampoArchivo(convert(source.getValorCampoArchivo()));
+		}
+		if (source.getTipoRelleno() != null) {
+			target.setTipoRelleno(EtlCatTipoRellenoConverter.convert(source.getTipoRelleno()));
 		}
 		return target;
     }

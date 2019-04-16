@@ -27,4 +27,10 @@ public class EtlCampoArchivoDto {
     private String descripcion;
     
     private String valorDefault;
+
+    private EtlCampoArchivoDto valorCampoArchivo;
+
+    private EtlCatTipoRellenoDto tipoRelleno;
+
+    private Integer numeroCampo;
 }

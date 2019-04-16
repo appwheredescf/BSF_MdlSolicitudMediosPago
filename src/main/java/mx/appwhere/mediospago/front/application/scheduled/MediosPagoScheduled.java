@@ -1,13 +1,16 @@
 package mx.appwhere.mediospago.front.application.scheduled;
 
-import static mx.appwhere.mediospago.front.application.constants.ApplicationConstants.CVE_PROCESO_MEDIOS_PAGO;
-
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.io.FileNotFoundException;
+import java.util.Date;
 import java.util.Optional;
+import java.util.Map;
+import java.util.List;
+import java.util.ArrayList;
 
+import mx.appwhere.mediospago.front.application.dto.etl.EtlArchivoDto;
+import mx.appwhere.mediospago.front.application.util.FileProcessor;
+import mx.appwhere.mediospago.front.application.util.OutFileProcessor;
 import org.apache.commons.net.ftp.FTPFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,12 +23,14 @@ import mx.appwhere.mediospago.front.application.converters.EtlProcesoConverter;
 import mx.appwhere.mediospago.front.application.dto.ResGralDto;
 import mx.appwhere.mediospago.front.application.dto.etl.EtlProcesoDto;
 import mx.appwhere.mediospago.front.application.dto.ftp.ArchivosFtpDto;
-import mx.appwhere.mediospago.front.application.util.FileProcessor;
+import mx.appwhere.mediospago.front.application.util.InFileProcessor;
 import mx.appwhere.mediospago.front.domain.entities.EtlProcesoEntity;
 import mx.appwhere.mediospago.front.domain.repositories.EtlProcesoRepository;
 import mx.appwhere.mediospago.front.domain.services.FTPService;
 import mx.appwhere.mediospago.front.domain.services.ValidadorArchivoService;
 import mx.appwhere.mediospago.front.domain.util.Util;
+
+import static mx.appwhere.mediospago.front.application.constants.ApplicationConstants.*;
 
 /**
  * 
@@ -95,26 +100,65 @@ public class MediosPagoScheduled {
 		File tempDirectory = fTPService.ftpToLocalDirectory(temporaryDirectory, etlProcesoDto.getConfiguracionFtpEntrada(), ftpFile.getName());
 		
 		/** Obtenemos los archivos correspondientes al proceso del directorio temporal **/
-		Map<String, FileProcessor> mapFileProcessor =  FileProcessor.getFilesProcess(tempDirectory, etlProcesoDto.getArchivosProceso());
-		
+		Map<String, FileProcessor> mapFileProcessor =  InFileProcessor.getFilesProcess(tempDirectory, etlProcesoDto.getArchivosProceso());
+
 		/** Validamos el nombre de los archivos */
 		lstErroresDto.addAll(validadorArchivoService.validarNombresArchivos(mapFileProcessor, etlProcesoDto.getCveProceso()));
-		
+
 		/** Si no existen errores */
 		if (lstErroresDto.isEmpty()) {
-		    
-		    /** Realizamos validacion de archivo cifras control */
-		    lstErroresDto.addAll(validadorArchivoService.validarCifrasControl(mapFileProcessor));
-		    
-		    /** Si no existen errores */
-		    if (lstErroresDto.isEmpty()) {
-			   /** Realizamos validacion de archivo principal **/
-			   lstErroresDto.addAll(validadorArchivoService.validarArchivoPrincipal(mapFileProcessor));
-		    }
-		    
-		} 
-		
-		LOGGER.info("Fin de procesamiento de archivo: {}, se encontraron los siguientes errorres: {}", ftpFile.getName(), lstErroresDto.toString());
-	
+
+			InFileProcessor archivoPrincipalFile = (InFileProcessor) mapFileProcessor.get(TIPO_ARCHIVO_CPRINCIPAL);
+			Long nRegistros = archivoPrincipalFile.countLines();
+
+			/** Realizamos validacion de archivo cifras control */
+			lstErroresDto.addAll(validadorArchivoService.validarCifrasControl(mapFileProcessor, nRegistros));
+
+			/** Si no existen errores */
+			if (lstErroresDto.isEmpty()) {
+
+				FileProcessor archivoSalidaCuenta = crearArchivoSalidaCuenta(etlProcesoDto, tempDirectory);
+
+				if (archivoSalidaCuenta != null) {
+
+					/** Agregamos archivo de salida a Map */
+					mapFileProcessor.put(archivoSalidaCuenta.getArchivoDto().getExtension(), archivoSalidaCuenta);
+
+					/** Realizamos validacion de archivo principal **/
+					lstErroresDto.addAll(validadorArchivoService.validarArchivoPrincipalGenerarSalida(mapFileProcessor, tempDirectory));
+
+				} else {
+					lstErroresDto.add(util.crearErrorDto(ETL_ERR_CREAR_ARCHIVO_CUENTA));
+				}
+			}
+		}
+
+		LOGGER.info("Fin de procesamiento de archivo: {}", ftpFile.getName());
+
+		if (!lstErroresDto.isEmpty()) {
+			LOGGER.info("Se encontraron los siguientes errorres: {}", lstErroresDto.toString());
+		}
     }
+
+    private FileProcessor crearArchivoSalidaCuenta(EtlProcesoDto etlProcesoDto, File tempDirectory) {
+
+		FileProcessor archivoSalidaCuenta = null;
+    	try {
+
+			Optional<EtlArchivoDto> archivoOptional = etlProcesoDto.getArchivosProceso().stream().filter(etlArchivoDto ->
+					etlArchivoDto.getExtension().equals(ApplicationConstants.TIPO_ARCHIVO_ALTACUENTA)
+			).findFirst();
+
+			if (archivoOptional.isPresent()) {
+
+				String fileName = "AltaCtaF" + util.getFechaAltaCuenta(new Date()) + ".txt";
+
+				archivoSalidaCuenta = new OutFileProcessor(tempDirectory + File.separator + fileName, archivoOptional.get());
+			}
+		} catch (FileNotFoundException e) {
+    		LOGGER.error(e.getMessage(), e);
+		}
+
+		return archivoSalidaCuenta;
+	}
 }

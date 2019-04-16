@@ -7,6 +7,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
+import mx.appwhere.mediospago.front.application.dto.etl.EtlCampoArchivoDto;
+import mx.appwhere.mediospago.front.application.dto.etl.EtlCatTipoRellenoDto;
 import org.apache.commons.io.FileUtils;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -28,6 +30,8 @@ public class UtilImpl<T> implements Util<T> {
     private static final Logger LOGGER = LoggerFactory.getLogger(MediosPagoScheduled.class);
     
     private static SimpleDateFormat formatoArchivoAP = new SimpleDateFormat("ddMMyyyy");
+	private static SimpleDateFormat formatoArchivoCTA = new SimpleDateFormat("dd/MM/yyyy");
+	private static SimpleDateFormat formatoArchivoAltaCTA = new SimpleDateFormat("yyMMdd");
 
     /**
      * Metodo utilitario para convertir un json a un objeto.
@@ -107,16 +111,30 @@ public class UtilImpl<T> implements Util<T> {
 		responseError.setMensaje(messageFormat);
 		return responseError;
     }
+
+	@Override
+    public boolean isValidNAme(String fileName, String extension) {
+
+		String regularExpresion = "^MED_SOL_CTA_TAR_TC[0-9]{2}[0-9]{1}[0-9]{2}_[a-zA-Z0-9]{4}_[0-9]{2}\\.extension$";
+		regularExpresion = regularExpresion.replace("extension", extension);
+
+		return fileName.matches(regularExpresion);
+	}
     
     @Override
     public boolean hasSpecialCharacters(String strValue) {
-    	return !strValue.matches("^[A-Z0-9_\\- ]*$");
+    	return !strValue.matches("^[A-Za-z0-9_\\- Ñ]*$");
     }
     
     @Override
     public boolean isNumeric(String strValue) {
     	return strValue.matches("^[0-9]*$");
     }
+
+	@Override
+	public boolean hasLowerCase(String strValue) {
+    	return !strValue.toUpperCase().equals(strValue);
+	}
     
     @Override
     public boolean isDateValid(String strFecha) {
@@ -130,4 +148,53 @@ public class UtilImpl<T> implements Util<T> {
 		}
 		return date != null;
     }
+
+    public String toDateCta(String fechaStr) {
+
+		try {
+    		Date date = formatoArchivoAP.parse(fechaStr);
+			fechaStr = formatoArchivoCTA.format(date);
+		} catch (Exception e) {
+			fechaStr = "";
+			LOGGER.info("Error al convertir la fecha", e);
+		}
+		return fechaStr;
+	}
+
+	@Override
+	public String ajustarTamanioCampo(EtlCatTipoRellenoDto tipoRellenoDto, String campo, int longitud) {
+		StringBuilder sbBuilder = new StringBuilder(campo);
+		if (tipoRellenoDto != null) {
+			if (tipoRellenoDto.getIzquierda()) {
+				while (sbBuilder.length() < longitud ) {
+					sbBuilder.insert(0, tipoRellenoDto.getCaracter());
+				}
+			} else {
+				while (sbBuilder.length() < longitud ) {
+					sbBuilder.append(tipoRellenoDto.getCaracter());
+				}
+			}
+		}
+		return sbBuilder.toString();
+	}
+
+	@Override
+	public String obtenerCampo(String registro, EtlCampoArchivoDto campoArchivoDto) {
+		return registro.substring(campoArchivoDto.getPosicionInicial() - 1, campoArchivoDto.getPosicionFinal());
+	}
+
+	@Override
+	public String obtenerCampo(String registro, int... indices) {
+		return registro.substring(indices[0] - 1, indices[1]);
+	}
+
+	@Override
+	public int getLongitudCampo(EtlCampoArchivoDto campoArchivoDto) {
+		return campoArchivoDto.getPosicionFinal() - campoArchivoDto.getPosicionInicial() + 1;
+	}
+
+	@Override
+	public String getFechaAltaCuenta(Date date) {
+		return formatoArchivoAltaCTA.format(date);
+	}
 }

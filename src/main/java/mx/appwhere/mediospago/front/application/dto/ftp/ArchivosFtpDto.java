@@ -2,6 +2,7 @@ package mx.appwhere.mediospago.front.application.dto.ftp;
 
 import java.util.List;
 
+import lombok.AllArgsConstructor;
 import org.apache.commons.net.ftp.FTPFile;
 
 import lombok.Data;

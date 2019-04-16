@@ -29,13 +29,18 @@ public final class ApplicationConstants {
     public static final String ETL_ERR_LINEAS_AP = "El archivo A_P, no contiene las lineas descritas en archivo C_C";
     public static final String ETL_ERR_CAMPO_VACIO = "El campo: {0}, de la linea: {1}, del archivo: {2}, no debe ser vacio";
     public static final String ETL_ERR_CARACTERES_ESP = "Se encontraron caracteres especiales en linea: {0} de archivo: {1}";
-    public static final String ETL_ERR_CAMPO_NUMERICO = "El campo: {0}, de la linea: {1}, del archivo: {2}, debe contener solo valores numéricos";
+    public static final String ETL_ERR_MINUSCULAS = "Se encontraron letras minusculas en linea: {0} de archivo: {1}";
+    public static final String ETL_ERR_CAMPO_NUMERICO = "El campo: {0}, de la linea: {1}, del archivo: {2}, debe contener solo valores numï¿½ricos";
     public static final String ETL_ERR_CAMPO_FECHA = "El campo: {0}, de la linea: {1}, del archivo: {2}, debe contener formato DDMMAAAA";
     public static final String ETL_ERR_VALOR_DEFAULT = "El valor del campo: {0}, de la linea: {1}, del archivo: {2}, debe ser: {3}";
+    public static final String ETL_ERR_CREAR_ARCHIVO_CUENTA = "Error al crear archivo de Salida Cuenta";
+    public static final String ETL_ERR_TARJETA_REPETIDA = "La tarjeta en fila {0}, se encuentra repetida";
     
     
     public static final String TIPO_ARCHIVO_CIFRAS_CONTROL = "C_C";
     public static final String TIPO_ARCHIVO_CPRINCIPAL = "A_P";
+    public static final String TIPO_ARCHIVO_ALTACUENTA = "txt";
+    public static final String TIPO_ARCHIVO_TARJETAS = "xlsx";
     
     public static final String CVE_PROCESO_MEDIOS_PAGO = "MED";
     
@@ -49,4 +54,20 @@ public final class ApplicationConstants {
     
     /** Definicion de indices de campos de archivos */
     public static final int[] CC_CAMPO_TOTAL_REGISTROS = new int[] {8, 13};
+
+    public static final int CTA_NUMERO_CAMPO_SEXO_MUJER = 3;
+    public static final int CTA_NUMERO_CAMPO_SEXO_HOMBRE = 4;
+    public static final int CTA_NUMERO_CAMPO_FECHA_NACIMIENTO = 13;
+    public static final int CTA_NUMERO_CAMPO_CODIGO_POSTAL = 14;
+    public static final int CTA_NUMERO_CAMPO_TELEFONO = 28;
+    public static final int CTA_NUMERO_CAMPO_CALLE = 31;
+    public static final int CTA_NUMERO_CAMPO_NO_EXTERIOR = 32;
+    public static final int CTA_NUMERO_CAMPO_COLONIA = 33;
+    public static final int CTA_NUMERO_CAMPO_CODIGO_POSTAL_CLIENTE = 34;
+
+    public static final int CAT_TIPO_ARCHIVO_ENTRADA = 1;
+    public static final int CAT_TIPO_ARCHIVO_SALIDA = 0;
+
+    public static final int XLS_NUMERO_COLUMNA_TARJETA = 3;
+
 }

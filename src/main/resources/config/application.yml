@@ -10,5 +10,5 @@ server:
     context-path: /BSF_MdlSolicitudMediosPago
 banner:
   location: banner.txt
-logging:
-  config: src/main/resources/config/logback-spring.xml
+#logging:
+  #config: src/main/resources/config/logback-spring.xml
