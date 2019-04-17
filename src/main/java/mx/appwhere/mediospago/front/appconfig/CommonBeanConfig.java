@@ -4,14 +4,17 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.concurrent.Executors;
 
+import mx.appwhere.mediospago.front.application.util.InExcelFileProcessor;
+import mx.appwhere.mediospago.front.application.util.InFileProcessor;
+import mx.appwhere.mediospago.front.application.util.OutFileProcessor;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.task.TaskExecutor;
+import org.springframework.context.annotation.Scope;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.concurrent.ConcurrentTaskScheduler;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 /**
  * Common third classes spring beans are registered here.
@@ -46,5 +49,23 @@ public class CommonBeanConfig {
     @Bean
     public TaskScheduler taskExecutor () {
         return new ConcurrentTaskScheduler(Executors.newScheduledThreadPool(5));
+    }
+
+    @Bean
+    @Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+    public InFileProcessor inFileProcessor() {
+        return new InFileProcessor();
+    }
+
+    @Bean
+    @Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+    public InExcelFileProcessor inExcelFileProcessor() {
+        return new InExcelFileProcessor();
+    }
+
+    @Bean
+    @Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+    public OutFileProcessor outFileProcessor() {
+        return new OutFileProcessor();
     }
 }

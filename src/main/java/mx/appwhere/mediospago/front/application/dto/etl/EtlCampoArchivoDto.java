@@ -13,6 +13,10 @@ public class EtlCampoArchivoDto {
     private Long id;
     
     private Long idArchivo;
+
+    private String cveArchivo;
+
+    private String extensionArchivo;
     
     private Integer posicionInicial;
     

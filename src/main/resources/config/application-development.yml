@@ -40,5 +40,10 @@ spring:
       dialect: org.hibernate.dialect.SQLServer2012Dialect
       ddl-auto: none
       
-temporal:
-  path: C:\ETL
+scheduled:
+  temporal:
+    path: C:\ETL
+  cron-expression:
+    medios-pago:
+      entrada: "0 30 */2 * * *"
+      salida:  "0 0 */2 * * *"

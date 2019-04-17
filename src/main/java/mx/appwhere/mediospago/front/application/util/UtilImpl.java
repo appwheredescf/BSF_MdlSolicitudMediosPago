@@ -7,6 +7,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
+import mx.appwhere.mediospago.front.application.constants.ApplicationConstants;
+import mx.appwhere.mediospago.front.application.dto.ResGralDto;
 import mx.appwhere.mediospago.front.application.dto.etl.EtlCampoArchivoDto;
 import mx.appwhere.mediospago.front.application.dto.etl.EtlCatTipoRellenoDto;
 import org.apache.commons.io.FileUtils;
@@ -16,24 +18,20 @@ import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-
 import com.google.gson.Gson;
-
-import mx.appwhere.mediospago.front.application.constants.ApplicationConstants;
-import mx.appwhere.mediospago.front.application.dto.ResGralDto;
-import mx.appwhere.mediospago.front.application.scheduled.MediosPagoScheduled;
 import mx.appwhere.mediospago.front.domain.util.Util;
+import org.springframework.util.StringUtils;
 
 @Component
 public class UtilImpl<T> implements Util<T> {
-    
-    private static final Logger LOGGER = LoggerFactory.getLogger(MediosPagoScheduled.class);
-    
-    private static SimpleDateFormat formatoArchivoAP = new SimpleDateFormat("ddMMyyyy");
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(UtilImpl.class);
+
+	private static SimpleDateFormat formatoArchivoAP = new SimpleDateFormat("ddMMyyyy");
 	private static SimpleDateFormat formatoArchivoCTA = new SimpleDateFormat("dd/MM/yyyy");
 	private static SimpleDateFormat formatoArchivoAltaCTA = new SimpleDateFormat("yyMMdd");
 
-    /**
+	/**
      * Metodo utilitario para convertir un json a un objeto.
      * @param objectRes
      * @param json
@@ -91,68 +89,69 @@ public class UtilImpl<T> implements Util<T> {
 		Gson gson = new Gson();
 		return gson.toJson(object);
     }
-    
-    @Override
-    public void clearDirectory(String pathDirectory) {
-		try {
-		    FileUtils.cleanDirectory(new File(pathDirectory));
-		} catch (IOException e) {
-		    LOGGER.error("Error al vaciar directorio {}", pathDirectory, e);
-		}
-    }
 
-    @Override
-    public ResGralDto crearErrorDto(String message, Object... args) {
-	
+	@Override
+	public void clearDirectory(String pathDirectory) {
+		try {
+			FileUtils.cleanDirectory(new File(pathDirectory));
+		} catch (IOException e) {
+			LOGGER.error("Error al vaciar directorio {}", pathDirectory, e);
+		}
+	}
+
+	@Override
+	public ResGralDto crearErrorDto(String message, Object... args) {
+
 		String messageFormat = new MessageFormat(message).format(args);
-	
+
 		ResGralDto responseError = new ResGralDto();
 		responseError.setEstatus(ApplicationConstants.ERR);
 		responseError.setMensaje(messageFormat);
 		return responseError;
-    }
+	}
 
 	@Override
-    public boolean isValidNAme(String fileName, String extension) {
+	public boolean isValidNAme(String fileName, String extension) {
 
 		String regularExpresion = "^MED_SOL_CTA_TAR_TC[0-9]{2}[0-9]{1}[0-9]{2}_[a-zA-Z0-9]{4}_[0-9]{2}\\.extension$";
 		regularExpresion = regularExpresion.replace("extension", extension);
 
 		return fileName.matches(regularExpresion);
 	}
-    
-    @Override
-    public boolean hasSpecialCharacters(String strValue) {
-    	return !strValue.matches("^[A-Za-z0-9_\\- Ñ]*$");
-    }
-    
-    @Override
-    public boolean isNumeric(String strValue) {
-    	return strValue.matches("^[0-9]*$");
-    }
+
+	@Override
+	public boolean hasSpecialCharacters(String strValue) {
+		return !strValue.matches("^[A-Za-z0-9_\\- Ñ]*$");
+	}
+
+	@Override
+	public boolean isNumeric(String strValue) {
+		return strValue.matches("^[0-9]*$");
+	}
 
 	@Override
 	public boolean hasLowerCase(String strValue) {
-    	return !strValue.toUpperCase().equals(strValue);
+		return !strValue.toUpperCase().equals(strValue);
 	}
-    
-    @Override
-    public boolean isDateValid(String strFecha) {
+
+	@Override
+	public boolean isDateValid(String strFecha) {
 
 		Date date = null;
 		formatoArchivoAP.setLenient(false);
 		try {
-		    date = formatoArchivoAP.parse(strFecha);
+			date = formatoArchivoAP.parse(strFecha);
 		} catch (Exception e) {
-		    LOGGER.info("Error al convertir la fecha", e);
+			LOGGER.info("Error al convertir la fecha", e);
 		}
 		return date != null;
-    }
+	}
 
-    public String toDateCta(String fechaStr) {
+	@Override
+	public String toDateCta(String fechaStr) {
 
 		try {
-    		Date date = formatoArchivoAP.parse(fechaStr);
+			Date date = formatoArchivoAP.parse(fechaStr);
 			fechaStr = formatoArchivoCTA.format(date);
 		} catch (Exception e) {
 			fechaStr = "";
@@ -179,11 +178,6 @@ public class UtilImpl<T> implements Util<T> {
 	}
 
 	@Override
-	public String obtenerCampo(String registro, EtlCampoArchivoDto campoArchivoDto) {
-		return registro.substring(campoArchivoDto.getPosicionInicial() - 1, campoArchivoDto.getPosicionFinal());
-	}
-
-	@Override
 	public String obtenerCampo(String registro, int... indices) {
 		return registro.substring(indices[0] - 1, indices[1]);
 	}
@@ -196,5 +190,33 @@ public class UtilImpl<T> implements Util<T> {
 	@Override
 	public String getFechaAltaCuenta(Date date) {
 		return formatoArchivoAltaCTA.format(date);
+	}
+
+	@Override
+	public ResGralDto validarCampoArchivo(EtlCampoArchivoDto campoArchivoDto, String registro, int numeroRegistro, String tipoArchivo) {
+
+		ResGralDto resGralDto = new ResGralDto();
+
+		registro = registro.trim();
+
+		if (StringUtils.isEmpty(registro) && campoArchivoDto.getObligatorio()) {
+			resGralDto = crearErrorDto(ApplicationConstants.ETL_ERR_CAMPO_VACIO, campoArchivoDto.getNombreCampo(), numeroRegistro, tipoArchivo);
+		} else if (campoArchivoDto.getTipoDato().equals(ApplicationConstants.TIPO_DATO_NUMERICO)  && !isNumeric(registro)) {
+			resGralDto = crearErrorDto(ApplicationConstants.ETL_ERR_CAMPO_NUMERICO, campoArchivoDto.getNombreCampo(), numeroRegistro, tipoArchivo);
+		} else if (campoArchivoDto.getTipoDato().equals(ApplicationConstants.TIPO_DATO_FECHA)  && !registro.equals("00000000") && !isDateValid(registro)) {
+			resGralDto = crearErrorDto(ApplicationConstants.ETL_ERR_CAMPO_FECHA, campoArchivoDto.getNombreCampo(), numeroRegistro, tipoArchivo);
+		} else {
+			resGralDto.setEstatus(ApplicationConstants.OK);
+		}
+
+		/** Validamos si el campo debe tener cierto valor por defecto **/
+		if (resGralDto.getEstatus() == ApplicationConstants.OK && campoArchivoDto.getValorDefault() != null
+				&& !campoArchivoDto.getValorDefault().equals(registro)) {
+			/** Descomentar en caso de requerir validar que el valor default sea el que venga en el archivo
+			 resGralDto = util.crearErrorDto(ApplicationConstants.ETL_ERR_VALOR_DEFAULT,
+			 campoArchivoDto.getNombreCampo(), numeroRegistro, tipoArchivo, campoArchivoDto.getValorDefault()); */
+		}
+
+		return resGralDto;
 	}
 }

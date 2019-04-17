@@ -1,16 +1,13 @@
 package mx.appwhere.mediospago.front.application.scheduled;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.Date;
 import java.util.Optional;
 import java.util.Map;
 import java.util.List;
 import java.util.ArrayList;
 
-import mx.appwhere.mediospago.front.application.dto.etl.EtlArchivoDto;
 import mx.appwhere.mediospago.front.application.util.FileProcessor;
-import mx.appwhere.mediospago.front.application.util.OutFileProcessor;
+import mx.appwhere.mediospago.front.domain.util.Util;
 import org.apache.commons.net.ftp.FTPFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,8 +24,7 @@ import mx.appwhere.mediospago.front.application.util.InFileProcessor;
 import mx.appwhere.mediospago.front.domain.entities.EtlProcesoEntity;
 import mx.appwhere.mediospago.front.domain.repositories.EtlProcesoRepository;
 import mx.appwhere.mediospago.front.domain.services.FTPService;
-import mx.appwhere.mediospago.front.domain.services.ValidadorArchivoService;
-import mx.appwhere.mediospago.front.domain.util.Util;
+import mx.appwhere.mediospago.front.domain.services.MediosPagoEntradaService;
 
 import static mx.appwhere.mediospago.front.application.constants.ApplicationConstants.*;
 
@@ -40,31 +36,34 @@ import static mx.appwhere.mediospago.front.application.constants.ApplicationCons
  *
  */
 @Component
-public class MediosPagoScheduled {
+public class MediosPagoEntradaScheduled {
     
-    private static final Logger LOGGER = LoggerFactory.getLogger(MediosPagoScheduled.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MediosPagoEntradaScheduled.class);
     
-    @Value("${temporal.path}")
+    @Value("${scheduled.temporal.path}")
     private String temporaryDirectory;
-    
-    private ValidadorArchivoService validadorArchivoService;
+
+    private MediosPagoEntradaService mediosPagoEntradaService;
     
     private EtlProcesoRepository etlProcesoRepository;
     
     private FTPService fTPService;
+
+    private Util util;
     
-    private Util<?> util;
-    
-    public MediosPagoScheduled( ValidadorArchivoService validadorArchivoService, EtlProcesoRepository etlProcesoRepository, FTPService fTPService, Util<?> util) {
-		this.validadorArchivoService = validadorArchivoService;
+    public MediosPagoEntradaScheduled(MediosPagoEntradaService mediosPagoEntradaService,
+									  EtlProcesoRepository etlProcesoRepository,
+									  FTPService fTPService,
+									  Util util) {
+    	this.mediosPagoEntradaService = mediosPagoEntradaService;
 		this.etlProcesoRepository = etlProcesoRepository;
 		this.fTPService = fTPService;
 		this.util = util;
     }
-    
-    @Scheduled(fixedRate = 500000)
-    public void executePaymentMethod() {
-	
+
+	@Scheduled(cron = "${scheduled.cron-expression.medios-pago.entrada}")
+    public void ejecutarProceso() {
+
 		util.clearDirectory(temporaryDirectory);
 		
 		Optional<EtlProcesoEntity> optionalProceso = etlProcesoRepository.findByCveProceso(CVE_PROCESO_MEDIOS_PAGO);
@@ -94,16 +93,16 @@ public class MediosPagoScheduled {
 	
 		List<ResGralDto> lstErroresDto = new ArrayList<>();
 		
-		LOGGER.info("Inicio de procesamiento de archivo {}", ftpFile.getName());
+		LOGGER.info("Inicio de procesamiento de directorio {}", ftpFile.getName());
 		
 		/** Copiamos el directorio FTP a procesar a un directory local **/
 		File tempDirectory = fTPService.ftpToLocalDirectory(temporaryDirectory, etlProcesoDto.getConfiguracionFtpEntrada(), ftpFile.getName());
 		
 		/** Obtenemos los archivos correspondientes al proceso del directorio temporal **/
-		Map<String, FileProcessor> mapFileProcessor =  InFileProcessor.getFilesProcess(tempDirectory, etlProcesoDto.getArchivosProceso());
+		Map<String, FileProcessor> mapFileProcessor =  fTPService.obtenerArchivosProceso(tempDirectory, etlProcesoDto.getArchivosProceso());
 
 		/** Validamos el nombre de los archivos */
-		lstErroresDto.addAll(validadorArchivoService.validarNombresArchivos(mapFileProcessor, etlProcesoDto.getCveProceso()));
+		lstErroresDto.addAll(mediosPagoEntradaService.validarNombresArchivos(mapFileProcessor, etlProcesoDto.getCveProceso()));
 
 		/** Si no existen errores */
 		if (lstErroresDto.isEmpty()) {
@@ -112,12 +111,12 @@ public class MediosPagoScheduled {
 			Long nRegistros = archivoPrincipalFile.countLines();
 
 			/** Realizamos validacion de archivo cifras control */
-			lstErroresDto.addAll(validadorArchivoService.validarCifrasControl(mapFileProcessor, nRegistros));
+			lstErroresDto.addAll(mediosPagoEntradaService.validarCifrasControl(mapFileProcessor, nRegistros));
 
 			/** Si no existen errores */
 			if (lstErroresDto.isEmpty()) {
 
-				FileProcessor archivoSalidaCuenta = crearArchivoSalidaCuenta(etlProcesoDto, tempDirectory);
+				FileProcessor archivoSalidaCuenta = mediosPagoEntradaService.crearArchivoSalidaCuenta(etlProcesoDto, tempDirectory);
 
 				if (archivoSalidaCuenta != null) {
 
@@ -125,7 +124,7 @@ public class MediosPagoScheduled {
 					mapFileProcessor.put(archivoSalidaCuenta.getArchivoDto().getExtension(), archivoSalidaCuenta);
 
 					/** Realizamos validacion de archivo principal **/
-					lstErroresDto.addAll(validadorArchivoService.validarArchivoPrincipalGenerarSalida(mapFileProcessor, tempDirectory));
+					lstErroresDto.addAll(mediosPagoEntradaService.validarArchivoPrincipalGenerarSalida(mapFileProcessor, tempDirectory));
 
 				} else {
 					lstErroresDto.add(util.crearErrorDto(ETL_ERR_CREAR_ARCHIVO_CUENTA));
@@ -133,32 +132,20 @@ public class MediosPagoScheduled {
 			}
 		}
 
-		LOGGER.info("Fin de procesamiento de archivo: {}", ftpFile.getName());
-
 		if (!lstErroresDto.isEmpty()) {
-			LOGGER.info("Se encontraron los siguientes errorres: {}", lstErroresDto.toString());
-		}
-    }
 
-    private FileProcessor crearArchivoSalidaCuenta(EtlProcesoDto etlProcesoDto, File tempDirectory) {
+			LOGGER.info("Se encontraron {} errores ", lstErroresDto.size());
 
-		FileProcessor archivoSalidaCuenta = null;
-    	try {
+			/** Creacion de archivo de errores */
+			mediosPagoEntradaService.crearArchivoErrores(lstErroresDto, tempDirectory);
 
-			Optional<EtlArchivoDto> archivoOptional = etlProcesoDto.getArchivosProceso().stream().filter(etlArchivoDto ->
-					etlArchivoDto.getExtension().equals(ApplicationConstants.TIPO_ARCHIVO_ALTACUENTA)
-			).findFirst();
-
-			if (archivoOptional.isPresent()) {
-
-				String fileName = "AltaCtaF" + util.getFechaAltaCuenta(new Date()) + ".txt";
-
-				archivoSalidaCuenta = new OutFileProcessor(tempDirectory + File.separator + fileName, archivoOptional.get());
+			/** Eliminamos Archivo de cuentas */
+			FileProcessor archivoSalidaCuenta = mapFileProcessor.get(TIPO_ARCHIVO_ALTACUENTA);
+			if (archivoSalidaCuenta != null) {
+				archivoSalidaCuenta.getFile().delete();
 			}
-		} catch (FileNotFoundException e) {
-    		LOGGER.error(e.getMessage(), e);
 		}
 
-		return archivoSalidaCuenta;
+		LOGGER.info("Fin de procesamiento de directorio: {}", ftpFile.getName());
 	}
 }

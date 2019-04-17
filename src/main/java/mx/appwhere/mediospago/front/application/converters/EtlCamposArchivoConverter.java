@@ -22,7 +22,6 @@ public class EtlCamposArchivoConverter {
 	
 		EtlCampoArchivoDto target = new EtlCampoArchivoDto();
 		target.setId(source.getId());
-		target.setIdArchivo(source.getIdArchivo());
 		target.setObligatorio(source.getObligatorio());
 		target.setPosicionFinal(source.getPosicionFinal());
 		target.setPosicionInicial(source.getPosicionInicial());
@@ -37,6 +36,11 @@ public class EtlCamposArchivoConverter {
 		}
 		if (source.getTipoRelleno() != null) {
 			target.setTipoRelleno(EtlCatTipoRellenoConverter.convert(source.getTipoRelleno()));
+		}
+		if (source.getArchivoEntity() != null) {
+			target.setIdArchivo(source.getArchivoEntity().getId());
+			target.setCveArchivo(source.getArchivoEntity().getCveArchivo());
+			target.setExtensionArchivo(source.getArchivoEntity().getExtension());
 		}
 		return target;
     }

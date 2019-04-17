@@ -18,24 +18,24 @@ import mx.appwhere.mediospago.front.domain.entities.EtlProcesoEntity;
 public class EtlProcesoConverter{
     
     public static EtlProcesoDto convert(EtlProcesoEntity source) {
-	EtlProcesoDto target = new EtlProcesoDto();
-	target.setId(source.getId());
-	target.setCveProceso(source.getCveProceso());
-	target.setNombreProceso(source.getNombreProceso());
-	target.setArchivosProceso(EtlArchivoConverter.convert(source.getArchivosProceso()));
-	
-	if (Objects.nonNull(source.getConfiguracionFtpEntrada())) {
-	    target.setConfiguracionFtpEntrada(EtlConfiguracionFtpConverter.convert(source.getConfiguracionFtpEntrada()));
-	}
-	if (Objects.nonNull(source.getConfiguracionFtpSalida())) {
-	    target.setConfiguracionFtpSalida(EtlConfiguracionFtpConverter.convert(source.getConfiguracionFtpSalida()));
-	}
-	return target;
+		EtlProcesoDto target = new EtlProcesoDto();
+		target.setId(source.getId());
+		target.setCveProceso(source.getCveProceso());
+		target.setNombreProceso(source.getNombreProceso());
+		target.setArchivosProceso(EtlArchivoConverter.convert(source.getArchivosProceso()));
+
+		if (Objects.nonNull(source.getConfiguracionFtpEntrada())) {
+			target.setConfiguracionFtpEntrada(EtlConfiguracionFtpConverter.convert(source.getConfiguracionFtpEntrada()));
+		}
+		if (Objects.nonNull(source.getConfiguracionFtpSalida())) {
+			target.setConfiguracionFtpSalida(EtlConfiguracionFtpConverter.convert(source.getConfiguracionFtpSalida()));
+		}
+		return target;
     }
 
     public static List<EtlProcesoDto> convert(List<EtlProcesoEntity> source) {
-	List<EtlProcesoDto> targetList = new ArrayList<>();
-	source.forEach(element -> targetList.add(convert(element)));
-	return targetList;
+		List<EtlProcesoDto> targetList = new ArrayList<>();
+		source.forEach(element -> targetList.add(convert(element)));
+		return targetList;
     }
 }

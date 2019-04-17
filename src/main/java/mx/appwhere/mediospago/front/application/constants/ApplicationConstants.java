@@ -24,6 +24,7 @@ public final class ApplicationConstants {
     
     public static final String ETL_ERR_NOMBRE_ARCHIVO = "Error en nombre de archivo: {0}";
     public static final String ETL_ERR_LECTURA_ARCHIVO = "Error en la lectura del archivo: {0}";
+    public static final String ETL_ERR_ESCTIRURA_ARCHIVO = "Error en la escritura del archivo: {0}";
     public static final String ETL_ERR_REGISTROS_ARCHIVO = "El Archivo: {0}, debe contener unicamente: {1} registros";
     public static final String ETL_ERR_LONGITUD_LINEA = "Error en longitud de la linea: {0} de archivo: {1}";
     public static final String ETL_ERR_LINEAS_AP = "El archivo A_P, no contiene las lineas descritas en archivo C_C";
@@ -34,7 +35,6 @@ public final class ApplicationConstants {
     public static final String ETL_ERR_CAMPO_FECHA = "El campo: {0}, de la linea: {1}, del archivo: {2}, debe contener formato DDMMAAAA";
     public static final String ETL_ERR_VALOR_DEFAULT = "El valor del campo: {0}, de la linea: {1}, del archivo: {2}, debe ser: {3}";
     public static final String ETL_ERR_CREAR_ARCHIVO_CUENTA = "Error al crear archivo de Salida Cuenta";
-    public static final String ETL_ERR_TARJETA_REPETIDA = "La tarjeta en fila {0}, se encuentra repetida";
     
     
     public static final String TIPO_ARCHIVO_CIFRAS_CONTROL = "C_C";
@@ -59,15 +59,15 @@ public final class ApplicationConstants {
     public static final int CTA_NUMERO_CAMPO_SEXO_HOMBRE = 4;
     public static final int CTA_NUMERO_CAMPO_FECHA_NACIMIENTO = 13;
     public static final int CTA_NUMERO_CAMPO_CODIGO_POSTAL = 14;
-    public static final int CTA_NUMERO_CAMPO_TELEFONO = 28;
-    public static final int CTA_NUMERO_CAMPO_CALLE = 31;
-    public static final int CTA_NUMERO_CAMPO_NO_EXTERIOR = 32;
-    public static final int CTA_NUMERO_CAMPO_COLONIA = 33;
-    public static final int CTA_NUMERO_CAMPO_CODIGO_POSTAL_CLIENTE = 34;
+
+
+
+    public static final int CTA_NUMERO_CAMPO_TELEFONO = 27;
+    public static final int CTA_NUMERO_CAMPO_CALLE = 30;
+    public static final int CTA_NUMERO_CAMPO_NO_EXTERIOR = 31;
+    public static final int CTA_NUMERO_CAMPO_COLONIA = 32;
+    public static final int CTA_NUMERO_CAMPO_CODIGO_POSTAL_CLIENTE = 33;
 
     public static final int CAT_TIPO_ARCHIVO_ENTRADA = 1;
     public static final int CAT_TIPO_ARCHIVO_SALIDA = 0;
-
-    public static final int XLS_NUMERO_COLUMNA_TARJETA = 3;
-
 }

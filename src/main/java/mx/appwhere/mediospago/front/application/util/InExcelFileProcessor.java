@@ -1,15 +1,26 @@
 package mx.appwhere.mediospago.front.application.util;
 
+import mx.appwhere.mediospago.front.application.constants.ApplicationConstants;
+import mx.appwhere.mediospago.front.application.dto.ResGralDto;
 import mx.appwhere.mediospago.front.application.dto.etl.EtlArchivoDto;
+import mx.appwhere.mediospago.front.application.dto.etl.EtlCampoArchivoDto;
+import mx.appwhere.mediospago.front.domain.exceptions.FileOperationException;
+import mx.appwhere.mediospago.front.domain.util.Util;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -21,43 +32,86 @@ public class InExcelFileProcessor implements FileProcessor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(InExcelFileProcessor.class);
 
+    @Autowired
+    private Util util;
+
+    private InputStream inputStream;
+
     private Workbook workbook;
 
     private EtlArchivoDto archivoDto;
 
     private File file;
 
+
     private int currentLine;
 
-    public InExcelFileProcessor(File file, EtlArchivoDto archivoDto) {
-        this.archivoDto = archivoDto;
-        this.file = file;
-    }
-
     @Override
-    public void open() {
+    public void open() throws FileOperationException{
         if (workbook == null) {
             try {
-                workbook = WorkbookFactory.create(file);
-            } catch (IOException e) {
+                inputStream = new FileInputStream(file);
+                workbook = WorkbookFactory.create(inputStream);
+            } catch (IOException | InvalidFormatException | IllegalArgumentException e) {
                 LOGGER.error(e.getMessage(), e);
+                throw new FileOperationException(ApplicationConstants.ETL_ERR_LECTURA_ARCHIVO, file.getName());
             }
         }
     }
 
-    public String getValueColumn(int nColumn) {
+    @Override
+    public String obtenerCampo(EtlCampoArchivoDto campoArchivoDto) {
         Sheet sheet = workbook.getSheetAt(0);
         Row row = sheet.getRow(currentLine);
-        currentLine ++;
-        return row.getCell(nColumn).getStringCellValue();
+        return row.getCell(campoArchivoDto.getNumeroCampo() - 1).getStringCellValue();
     }
 
-    public Integer getRowNum() {
-        if (workbook != null) {
-            return  workbook.getSheetAt(0).getLastRowNum();
-        }
-        return null;
+    public void getNextLine () {
+        currentLine++;
     }
+
+    @Override
+    public List<ResGralDto> validarCamposArchivo() {
+
+        List<ResGralDto> lstErrores = new ArrayList<>();
+
+        archivoDto.getListaCampos().forEach(campoArchivoDto -> {
+            String campo = obtenerCampo(campoArchivoDto);
+
+            ResGralDto resGralDto = util.validarCampoArchivo(campoArchivoDto, campo, currentLine + 1, archivoDto.getExtension());
+
+            if (resGralDto.getEstatus() == ApplicationConstants.ERR) {
+                lstErrores.add(resGralDto);
+            }
+        });
+
+        return  lstErrores;
+    }
+
+    @Override
+    public void close() {
+        try {
+            if (inputStream != null) {
+                inputStream.close();
+                inputStream = null;
+            }
+            workbook = null;
+            currentLine = 0;
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public void setArchivoDto(EtlArchivoDto archivoDto) {
+        this.archivoDto = archivoDto;
+    }
+
+    @Override
+    public void setFile(File file) {
+        this.file = file;
+    }
+
     @Override
     public EtlArchivoDto getArchivoDto() {
         return this.archivoDto;
@@ -68,14 +122,4 @@ public class InExcelFileProcessor implements FileProcessor {
         return this.file;
     }
 
-    @Override
-    public void close() {
-        try {
-            workbook.close();
-            workbook = null;
-            currentLine = 0;
-        } catch (IOException e) {
-            LOGGER.error(e.getMessage(), e);
-        }
-    }
 }

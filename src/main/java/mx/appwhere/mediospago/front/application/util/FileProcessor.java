@@ -1,10 +1,14 @@
 package mx.appwhere.mediospago.front.application.util;
 
+import mx.appwhere.mediospago.front.application.constants.ApplicationConstants;
+import mx.appwhere.mediospago.front.application.dto.ResGralDto;
 import mx.appwhere.mediospago.front.application.dto.etl.EtlArchivoDto;
+import mx.appwhere.mediospago.front.application.dto.etl.EtlCampoArchivoDto;
+import mx.appwhere.mediospago.front.domain.exceptions.FileOperationException;
+import org.springframework.util.StringUtils;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.util.List;
 
 /**
  *
@@ -14,11 +18,19 @@ import java.io.IOException;
  */
 public interface FileProcessor {
 
-    void open() throws IOException;
+    String obtenerCampo(EtlCampoArchivoDto campoArchivoDto);
+
+    List<ResGralDto> validarCamposArchivo();
+
+    void open() throws FileOperationException;
 
     EtlArchivoDto getArchivoDto();
 
+    void setArchivoDto(EtlArchivoDto etlArchivoDto);
+
     File getFile();
+
+    void setFile(File file);
 
     void close();
 

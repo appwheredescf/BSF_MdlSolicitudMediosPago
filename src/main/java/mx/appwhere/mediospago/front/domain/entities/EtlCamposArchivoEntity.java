@@ -16,9 +16,7 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "bsf_etl_campos_archivo")
 public class EtlCamposArchivoEntity extends AbstractDomainEntity<Long> {
-    
-    private Long idArchivo;
-    
+
     private Integer posicionInicial;
     
     private Integer posicionFinal;
@@ -44,14 +42,10 @@ public class EtlCamposArchivoEntity extends AbstractDomainEntity<Long> {
     @ManyToOne
     @JoinColumn(name = "idTipoDato", insertable = false, updatable = false)
     private EtlCatTipoDatoEntity catTipoDato;
-    
-    public Long getIdArchivo() {
-        return idArchivo;
-    }
 
-    public void setIdArchivo(Long idArchivo) {
-        this.idArchivo = idArchivo;
-    }
+    @ManyToOne
+    @JoinColumn(name = "idArchivo", insertable = false, updatable = false)
+    private EtlArchivoEntity archivoEntity;
 
     public EtlCatCamposArchivoEntity getCampoArchivo() {
         return campoArchivo;
@@ -123,5 +117,13 @@ public class EtlCamposArchivoEntity extends AbstractDomainEntity<Long> {
 
     public void setNumeroCampo(Integer numeroCampo) {
         this.numeroCampo = numeroCampo;
+    }
+
+    public EtlArchivoEntity getArchivoEntity() {
+        return archivoEntity;
+    }
+
+    public void setArchivoEntity(EtlArchivoEntity archivoEntity) {
+        this.archivoEntity = archivoEntity;
     }
 }
