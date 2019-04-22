@@ -25,6 +25,8 @@ wso2:
 
       
 spring:
+  jmx:
+    enabled: false
   sqlserver:
     console:
       enabled: true
