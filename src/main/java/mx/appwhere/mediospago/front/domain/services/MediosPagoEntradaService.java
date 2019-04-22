@@ -10,7 +10,7 @@ import mx.appwhere.mediospago.front.application.util.FileProcessor;
 
 public interface MediosPagoEntradaService {
 
-    List<ResGralDto> validarNombresArchivos(Map<String, FileProcessor> lstFileProcess, String cveProceso);
+    List<ResGralDto> validarNombresArchivos(Map<String, FileProcessor> lstFileProcess);
     
     List<ResGralDto> validarCifrasControl (Map<String, FileProcessor> mapFileProcess, Long nRegistrosAP);
     

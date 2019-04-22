@@ -24,13 +24,12 @@ import org.springframework.stereotype.Service;
 import mx.appwhere.mediospago.front.application.constants.ApplicationConstants;
 import mx.appwhere.mediospago.front.application.dto.etl.EtlConfiguracionFtpDto;
 import mx.appwhere.mediospago.front.application.dto.ftp.ArchivosFtpDto;
-import mx.appwhere.mediospago.front.application.scheduled.MediosPagoEntradaScheduled;
 import mx.appwhere.mediospago.front.domain.services.FTPService;
 
 @Service
 public class FTPServiceImpl implements FTPService {
     
-    private static final Logger LOGGER = LoggerFactory.getLogger(MediosPagoEntradaScheduled.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FTPServiceImpl.class);
 
     private ApplicationContext applicationContext;
 

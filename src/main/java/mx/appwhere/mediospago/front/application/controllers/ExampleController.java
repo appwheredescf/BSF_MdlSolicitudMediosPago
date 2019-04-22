@@ -1,4 +1,4 @@
-package mx.appwhere.mediospago.front.application.controllers.example;
+package mx.appwhere.mediospago.front.application.controllers;
 
 import javax.validation.Valid;
 

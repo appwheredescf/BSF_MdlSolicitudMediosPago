@@ -45,14 +45,14 @@ public class MediosPagoEntradaServiceImpl implements MediosPagoEntradaService {
     	this.util = util;
 	}
 
-    public List<ResGralDto> validarNombresArchivos(Map<String, FileProcessor> mapFileProcess, String cveProceso) {
+    public List<ResGralDto> validarNombresArchivos(Map<String, FileProcessor> mapFileProcess) {
 
 		List<ResGralDto> lstErrores = new ArrayList<>();
 
 		mapFileProcess.forEach((key, fileProcessor) -> {
 		    
 		    if (fileProcessor.getArchivoDto().getTipoArchivo() == ApplicationConstants.CAT_TIPO_ARCHIVO_ENTRADA
-					&&  !validarNombreArchivo (fileProcessor.getFile().getName(), cveProceso, fileProcessor.getArchivoDto().getExtension())) {
+					&&  !validarNombreArchivo (fileProcessor.getFile().getName(), fileProcessor.getArchivoDto().getExtension())) {
 		    	lstErrores.add(util.crearErrorDto(ApplicationConstants.ETL_ERR_NOMBRE_ARCHIVO, fileProcessor.getArchivoDto().getExtension()));
 		    }
 		});
@@ -60,19 +60,15 @@ public class MediosPagoEntradaServiceImpl implements MediosPagoEntradaService {
     	return lstErrores;
     }
 
-    private boolean validarNombreArchivo (String fileName, String cveProceso, String extension) {
+    private boolean validarNombreArchivo (String fileName, String extension) {
 	
 		boolean isValid = Boolean.FALSE;
-		
-		if (cveProceso.equals(ApplicationConstants.CVE_PROCESO_MEDIOS_PAGO)) {
-		    
-		    if (extension.equals(ApplicationConstants.TIPO_ARCHIVO_TARJETAS) ) {
-		    	isValid = Boolean.TRUE;
-		    } else {
-		    	isValid = util.isValidNAme(fileName, extension);
-		    }
+
+		if (extension.equals(ApplicationConstants.TIPO_ARCHIVO_TARJETAS) ) {
+			isValid = Boolean.TRUE;
+		} else {
+			isValid = util.isValidNAme(fileName, extension);
 		}
-		
 		return isValid;
     }
     

@@ -93,7 +93,11 @@ public class UtilImpl<T> implements Util<T> {
 	@Override
 	public void clearDirectory(String pathDirectory) {
 		try {
-			FileUtils.cleanDirectory(new File(pathDirectory));
+			File directorio = new File(pathDirectory);
+
+			if (directorio.exists()) {
+				FileUtils.cleanDirectory(new File(pathDirectory));
+			}
 		} catch (IOException e) {
 			LOGGER.error("Error al vaciar directorio {}", pathDirectory, e);
 		}

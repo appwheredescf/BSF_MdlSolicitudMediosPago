@@ -64,28 +64,35 @@ public class MediosPagoEntradaScheduled {
 	@Scheduled(cron = "${scheduled.cron-expression.medios-pago.entrada}")
     public void ejecutarProceso() {
 
-		util.clearDirectory(temporaryDirectory);
-		
-		Optional<EtlProcesoEntity> optionalProceso = etlProcesoRepository.findByCveProceso(CVE_PROCESO_MEDIOS_PAGO);
-		
-		if (optionalProceso.isPresent()) {
-		   
-		    EtlProcesoDto etlProcesoDto = EtlProcesoConverter.convert(optionalProceso.get());
-		    
-		    ArchivosFtpDto archivosFtpDto = fTPService.listDirectories(etlProcesoDto.getConfiguracionFtpEntrada());
-		    
-		    if (archivosFtpDto.getEstatus() == ApplicationConstants.OK) {
-				
-				int i = 0;
-				while(i < archivosFtpDto.getListaArchivosFtpProcesar().size()) {
-				    
-				    procesarDirectorio(etlProcesoDto, archivosFtpDto.getListaArchivosFtpProcesar().get(i));
-				    
-				    i++;
+    	File directorioTemporal = new File(temporaryDirectory);
+
+    	if (directorioTemporal.exists()) {
+
+			util.clearDirectory(temporaryDirectory);
+
+			Optional<EtlProcesoEntity> optionalProceso = etlProcesoRepository.findByCveProceso(CVE_PROCESO_MEDIOS_PAGO_ENTRADA);
+
+			if (optionalProceso.isPresent()) {
+
+				EtlProcesoDto etlProcesoDto = EtlProcesoConverter.convert(optionalProceso.get());
+
+				ArchivosFtpDto archivosFtpDto = fTPService.listDirectories(etlProcesoDto.getConfiguracionFtpEntrada());
+
+				if (archivosFtpDto.getEstatus() == ApplicationConstants.OK) {
+
+					int i = 0;
+					while (i < archivosFtpDto.getListaArchivosFtpProcesar().size()) {
+
+						procesarDirectorio(etlProcesoDto, archivosFtpDto.getListaArchivosFtpProcesar().get(i));
+
+						i++;
+					}
+				} else {
+					LOGGER.info(archivosFtpDto.getMensaje());
 				}
-		    } else {
-		    	LOGGER.info(archivosFtpDto.getMensaje());
-		    }
+			}
+		} else {
+    		LOGGER.error(ApplicationConstants.ETL_ERR_NO_DIRECTORIO, directorioTemporal.getName());
 		}
     }
     
@@ -94,42 +101,49 @@ public class MediosPagoEntradaScheduled {
 		List<ResGralDto> lstErroresDto = new ArrayList<>();
 		
 		LOGGER.info("Inicio de procesamiento de directorio {}", ftpFile.getName());
-		
+
 		/** Copiamos el directorio FTP a procesar a un directory local **/
 		File tempDirectory = fTPService.ftpToLocalDirectory(temporaryDirectory, etlProcesoDto.getConfiguracionFtpEntrada(), ftpFile.getName());
-		
+
 		/** Obtenemos los archivos correspondientes al proceso del directorio temporal **/
 		Map<String, FileProcessor> mapFileProcessor =  fTPService.obtenerArchivosProceso(tempDirectory, etlProcesoDto.getArchivosProceso());
 
-		/** Validamos el nombre de los archivos */
-		lstErroresDto.addAll(mediosPagoEntradaService.validarNombresArchivos(mapFileProcessor, etlProcesoDto.getCveProceso()));
+		try {
 
-		/** Si no existen errores */
-		if (lstErroresDto.isEmpty()) {
-
-			InFileProcessor archivoPrincipalFile = (InFileProcessor) mapFileProcessor.get(TIPO_ARCHIVO_CPRINCIPAL);
-			Long nRegistros = archivoPrincipalFile.countLines();
-
-			/** Realizamos validacion de archivo cifras control */
-			lstErroresDto.addAll(mediosPagoEntradaService.validarCifrasControl(mapFileProcessor, nRegistros));
+			/** Validamos el nombre de los archivos */
+			lstErroresDto.addAll(mediosPagoEntradaService.validarNombresArchivos(mapFileProcessor));
 
 			/** Si no existen errores */
 			if (lstErroresDto.isEmpty()) {
 
-				FileProcessor archivoSalidaCuenta = mediosPagoEntradaService.crearArchivoSalidaCuenta(etlProcesoDto, tempDirectory);
+				InFileProcessor archivoPrincipalFile = (InFileProcessor) mapFileProcessor.get(TIPO_ARCHIVO_CPRINCIPAL);
+				Long nRegistros = archivoPrincipalFile.countLines();
 
-				if (archivoSalidaCuenta != null) {
+				/** Realizamos validacion de archivo cifras control */
+				lstErroresDto.addAll(mediosPagoEntradaService.validarCifrasControl(mapFileProcessor, nRegistros));
 
-					/** Agregamos archivo de salida a Map */
-					mapFileProcessor.put(archivoSalidaCuenta.getArchivoDto().getExtension(), archivoSalidaCuenta);
+				/** Si no existen errores */
+				if (lstErroresDto.isEmpty()) {
 
-					/** Realizamos validacion de archivo principal **/
-					lstErroresDto.addAll(mediosPagoEntradaService.validarArchivoPrincipalGenerarSalida(mapFileProcessor, tempDirectory));
+					FileProcessor archivoSalidaCuenta = mediosPagoEntradaService.crearArchivoSalidaCuenta(etlProcesoDto, tempDirectory);
 
-				} else {
-					lstErroresDto.add(util.crearErrorDto(ETL_ERR_CREAR_ARCHIVO_CUENTA));
+					if (archivoSalidaCuenta != null) {
+
+						/** Agregamos archivo de salida a Map */
+						mapFileProcessor.put(archivoSalidaCuenta.getArchivoDto().getExtension(), archivoSalidaCuenta);
+
+						/** Realizamos validacion de archivo principal **/
+						lstErroresDto.addAll(mediosPagoEntradaService.validarArchivoPrincipalGenerarSalida(mapFileProcessor, tempDirectory));
+
+					} else {
+						lstErroresDto.add(util.crearErrorDto(ETL_ERR_CREAR_ARCHIVO_CUENTA));
+					}
 				}
 			}
+
+		} catch (Exception e) {
+			LOGGER. error(e.getMessage());
+			lstErroresDto.add(util.crearErrorDto(ETL_ERR_ERROR_INESPERADO, e.getMessage()));
 		}
 
 		if (!lstErroresDto.isEmpty()) {

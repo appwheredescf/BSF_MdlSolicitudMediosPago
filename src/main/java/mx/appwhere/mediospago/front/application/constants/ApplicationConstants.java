@@ -35,14 +35,16 @@ public final class ApplicationConstants {
     public static final String ETL_ERR_CAMPO_FECHA = "El campo: {0}, de la linea: {1}, del archivo: {2}, debe contener formato DDMMAAAA";
     public static final String ETL_ERR_VALOR_DEFAULT = "El valor del campo: {0}, de la linea: {1}, del archivo: {2}, debe ser: {3}";
     public static final String ETL_ERR_CREAR_ARCHIVO_CUENTA = "Error al crear archivo de Salida Cuenta";
-    
+    public static final String ETL_ERR_ERROR_INESPERADO = "Ocurrio un error inesperado, consulte al equipo de soporte: {0}";
+    public static final String ETL_ERR_NO_DIRECTORIO = "No existe el directorio temporal {} para ejecutar el proceso";
     
     public static final String TIPO_ARCHIVO_CIFRAS_CONTROL = "C_C";
     public static final String TIPO_ARCHIVO_CPRINCIPAL = "A_P";
     public static final String TIPO_ARCHIVO_ALTACUENTA = "txt";
     public static final String TIPO_ARCHIVO_TARJETAS = "xlsx";
     
-    public static final String CVE_PROCESO_MEDIOS_PAGO = "MED";
+    public static final String CVE_PROCESO_MEDIOS_PAGO_ENTRADA = "MED_ENTRADA";
+    public static final String CVE_PROCESO_MEDIOS_PAGO_SALIDA = "MED_SALIDA";
     
     public static final int OK  = 1;
     public static final int ERR = 0;
