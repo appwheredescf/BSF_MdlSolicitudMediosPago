@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.util.Optional;
@@ -28,6 +29,7 @@ import static mx.appwhere.mediospago.front.application.constants.ApplicationCons
  * @since 22/04/2019
  *
  */
+@Component
 public class MediosPagoSalidaScheduled {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MediosPagoSalidaScheduled.class);
@@ -78,7 +80,6 @@ public class MediosPagoSalidaScheduled {
             } else {
                 LOGGER.info(archivosFtpDto.getMensaje());
             }
-
         } else {
             LOGGER.error(ApplicationConstants.ETL_ERR_NO_DIRECTORIO, directorioTemporal.getName());
         }

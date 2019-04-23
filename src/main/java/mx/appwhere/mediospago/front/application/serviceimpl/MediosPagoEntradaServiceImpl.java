@@ -62,7 +62,7 @@ public class MediosPagoEntradaServiceImpl implements MediosPagoEntradaService {
 
     private boolean validarNombreArchivo (String fileName, String extension) {
 	
-		boolean isValid = Boolean.FALSE;
+		boolean isValid;
 
 		if (extension.equals(ApplicationConstants.TIPO_ARCHIVO_TARJETAS) ) {
 			isValid = Boolean.TRUE;
