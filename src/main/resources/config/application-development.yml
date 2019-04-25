@@ -37,7 +37,7 @@ spring:
       password: Bansefi#2016
       driverClassName: com.microsoft.sqlserver.jdbc.SQLServerDriver
   jpa:
-    show-sql: true
+    show-sql: false
     hibernate:
       dialect: org.hibernate.dialect.SQLServer2012Dialect
       ddl-auto: none

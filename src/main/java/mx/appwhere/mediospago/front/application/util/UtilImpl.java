@@ -4,6 +4,9 @@ import java.io.File;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.Period;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -222,5 +225,20 @@ public class UtilImpl<T> implements Util<T> {
 		}
 
 		return resGralDto;
+	}
+
+	@Override
+	public boolean validarEdad(String fecha) {
+		DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		LocalDate fechaNac = LocalDate.parse(fecha, fmt);
+		LocalDate ahora = LocalDate.now();
+
+		Period periodo = Period.between(fechaNac, ahora);
+
+		if(periodo.getYears() < ApplicationConstants.VAR_EDAD){
+			return false;
+		}else{
+			return true;
+		}
 	}
 }

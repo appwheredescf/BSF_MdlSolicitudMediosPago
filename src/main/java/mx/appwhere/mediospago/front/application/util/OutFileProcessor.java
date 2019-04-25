@@ -61,6 +61,11 @@ public class OutFileProcessor implements FileProcessor {
         }
     }
 
+    @Override
+    public int getCurrentLine() {
+        return 0;
+    }
+
     public String obtenerCampo(EtlCampoArchivoDto campoArchivoDto) {
         return "";
     }

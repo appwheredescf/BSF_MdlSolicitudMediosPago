@@ -1,5 +1,6 @@
 package mx.appwhere.mediospago.front.domain.util;
 
+import java.time.Period;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -40,4 +41,6 @@ public interface Util<T> {
     String getFechaAltaCuenta(Date date);
 
     ResGralDto validarCampoArchivo(EtlCampoArchivoDto campoArchivoDto, String registro, int numeroRegistro, String tipoArchivo);
+
+    boolean validarEdad(String fecha);
 }

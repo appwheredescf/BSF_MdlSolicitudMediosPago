@@ -135,4 +135,9 @@ public class InFileProcessor implements FileProcessor {
     public void setFile(File file) {
         this.file = file;
     }
+
+    @Override
+    public int getCurrentLine(){
+        return currentLine;
+    }
 }

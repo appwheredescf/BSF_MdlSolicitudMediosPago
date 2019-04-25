@@ -7,10 +7,15 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.Optional;
 
+import mx.appwhere.mediospago.front.application.converters.EtlArchivoConverter;
+import mx.appwhere.mediospago.front.application.converters.EtlCamposArchivoConverter;
 import mx.appwhere.mediospago.front.application.dto.etl.EtlArchivoDto;
 import mx.appwhere.mediospago.front.application.dto.etl.EtlProcesoDto;
 import mx.appwhere.mediospago.front.application.util.*;
+import mx.appwhere.mediospago.front.domain.entities.EtlCamposArchivoEntity;
 import mx.appwhere.mediospago.front.domain.exceptions.FileOperationException;
+import mx.appwhere.mediospago.front.domain.repositories.EtlCamposArchivoRepository;
+import mx.appwhere.mediospago.front.domain.repositories.EtlProcesoRepository;
 import mx.appwhere.mediospago.front.domain.util.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +27,8 @@ import mx.appwhere.mediospago.front.application.constants.ApplicationConstants;
 import mx.appwhere.mediospago.front.application.dto.ResGralDto;
 import mx.appwhere.mediospago.front.application.dto.etl.EtlCampoArchivoDto;
 import mx.appwhere.mediospago.front.domain.services.MediosPagoEntradaService;
+
+import javax.swing.text.html.Option;
 
 /**
  * 
@@ -39,10 +46,13 @@ public class MediosPagoEntradaServiceImpl implements MediosPagoEntradaService {
 
     private Util util;
 
+     private EtlCamposArchivoRepository etlCamposArchivoRepository;
+
     @Autowired
-    public MediosPagoEntradaServiceImpl(ApplicationContext applicationContext, Util util) {
+    public MediosPagoEntradaServiceImpl(ApplicationContext applicationContext, Util util,EtlCamposArchivoRepository etlCamposArchivoRepository) {
 		this.applicationContext = applicationContext;
     	this.util = util;
+    	this.etlCamposArchivoRepository = etlCamposArchivoRepository;
 	}
 
     public List<ResGralDto> validarNombresArchivos(Map<String, FileProcessor> mapFileProcess) {
@@ -128,9 +138,7 @@ public class MediosPagoEntradaServiceImpl implements MediosPagoEntradaService {
 			archivoPrincipal.open();
 			archivoSalidaCuenta.open();
 			archivoCuentasExcel.open();
-
 		    while (archivoPrincipal.hasNext() && lstErrores.isEmpty()) {
-
 		    	archivoPrincipal.getNextLine();
 				archivoCuentasExcel.getNextLine();
 
@@ -139,6 +147,24 @@ public class MediosPagoEntradaServiceImpl implements MediosPagoEntradaService {
 
 				/** Validamos los campos del archivo de tarjetas */
 				lstErrores.addAll(archivoCuentasExcel.validarCamposArchivo());
+				/** Validamos el concecutivo medio**/
+				Optional<EtlCampoArchivoDto> campoConseMedioArchivoEntityAP = archivoPrincipal.getArchivoDto().getListaCampos().stream()
+						.filter(etlCampoArchivoDto -> etlCampoArchivoDto.getNumeroCampo() == ApplicationConstants.CAM_CONSECUTIVO_MEDIO_AP ).findFirst();
+				Optional<EtlCampoArchivoDto> campoConseMedioArchivoEntityExcel = archivoCuentasExcel.getArchivoDto().getListaCampos().stream()
+						.filter(etlCampoArchivoDto -> etlCampoArchivoDto.getNumeroCampo() == ApplicationConstants.CAM_CONSECUTIVO_MEDIO_XLSL ).findFirst();
+				String consMedioAP = archivoPrincipal.obtenerCampo(campoConseMedioArchivoEntityAP.get());
+				String consMedioXLSX = archivoCuentasExcel.obtenerCampo(campoConseMedioArchivoEntityExcel.get());
+				if(!consMedioAP.equals(consMedioXLSX)){
+					lstErrores.add(util.crearErrorDto(ApplicationConstants.ETL_ERR_NO_CONS_MEDIO));
+				}
+
+				/** Se valida que sea mayor de edad **/
+				Optional<EtlCampoArchivoDto> campoEdadArchivoEntityAP = archivoPrincipal.getArchivoDto().getListaCampos().stream()
+						.filter(etlCampoArchivoDto -> etlCampoArchivoDto.getNumeroCampo() == ApplicationConstants.CAM_EDAD_AP).findFirst();
+				String edadAP = archivoPrincipal.obtenerCampo(campoEdadArchivoEntityAP.get());
+				if(!util.validarEdad(util.toDateCta(edadAP))){
+					lstErrores.add(util.crearErrorDto(ApplicationConstants.ETL_ERRO_NO_MAYOR_EDAD, archivoPrincipal.getCurrentLine()));
+				}
 
 				if (lstErrores.isEmpty()) {
 					String registroArchivoCuenta = generarRegistroArchivoCuenta(archivoSalidaCuenta.getArchivoDto().getListaCampos(), mapFileProcess);

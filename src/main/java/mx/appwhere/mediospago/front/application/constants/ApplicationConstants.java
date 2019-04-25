@@ -37,6 +37,8 @@ public final class ApplicationConstants {
     public static final String ETL_ERR_CREAR_ARCHIVO_CUENTA = "Error al crear archivo de Salida Cuenta";
     public static final String ETL_ERR_ERROR_INESPERADO = "Ocurrio un error inesperado, consulte al equipo de soporte: {0}";
     public static final String ETL_ERR_NO_DIRECTORIO = "No existe el directorio temporal {} para ejecutar el proceso";
+    public static final String ETL_ERR_NO_CONS_MEDIO = "No coincide el dato Concecutivo Medio en los archivos AP y XLSX";
+    public static final String ETL_ERRO_NO_MAYOR_EDAD = "No es mayor de edad en el campo {0} del archivo Principal";
     
     public static final String TIPO_ARCHIVO_CIFRAS_CONTROL = "C_C";
     public static final String TIPO_ARCHIVO_CPRINCIPAL = "A_P";
@@ -72,4 +74,22 @@ public final class ApplicationConstants {
 
     public static final int CAT_TIPO_ARCHIVO_ENTRADA = 1;
     public static final int CAT_TIPO_ARCHIVO_SALIDA = 0;
+
+    //Variables estaticas para obtener campos del consecutivo medio de AP y XLSX
+
+    public static final int CAM_CONSECUTIVO_MEDIO_AP = 57;
+    public static final int CAM_CONSECUTIVO_MEDIO_XLSL = 1;
+
+    //Variables estaticas para obtener la edad del AP
+
+    public static final int CAM_EDAD_AP = 30;
+
+
+    //Clave de archivos
+    public  static  final  String CVE_ARCHIVO_AP = "AP";
+    public static final  String CVE_ARCHIVO_XLSX = "TARJ";
+
+
+    //Variable para validar Edad
+    public static final int VAR_EDAD = 18;
 }

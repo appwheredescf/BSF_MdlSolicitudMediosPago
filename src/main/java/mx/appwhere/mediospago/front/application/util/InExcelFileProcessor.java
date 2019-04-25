@@ -7,10 +7,7 @@ import mx.appwhere.mediospago.front.application.dto.etl.EtlCampoArchivoDto;
 import mx.appwhere.mediospago.front.domain.exceptions.FileOperationException;
 import mx.appwhere.mediospago.front.domain.util.Util;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.apache.poi.ss.usermodel.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,7 +60,20 @@ public class InExcelFileProcessor implements FileProcessor {
     public String obtenerCampo(EtlCampoArchivoDto campoArchivoDto) {
         Sheet sheet = workbook.getSheetAt(0);
         Row row = sheet.getRow(currentLine);
-        return row.getCell(campoArchivoDto.getNumeroCampo() - 1).getStringCellValue();
+       //Cell.CELL_TYPE_NUMERIC;
+        Cell cell =row.getCell(campoArchivoDto.getNumeroCampo()-1);  /**/
+        switch (cell.getCellType()) {
+            case Cell.CELL_TYPE_NUMERIC:
+                //System.out.print(cell.getNumericCellValue() + "(Integer)\t");
+                return String.valueOf(cell.getNumericCellValue());
+
+            case Cell.CELL_TYPE_STRING:
+                //System.out.print(cell.getStringCellValue() + "(String)\t");
+                return cell.getStringCellValue();
+                default:
+                    return null;
+
+        }
     }
 
     public void getNextLine () {
@@ -100,6 +110,11 @@ public class InExcelFileProcessor implements FileProcessor {
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
         }
+    }
+
+    @Override
+    public int getCurrentLine() {
+        return currentLine;
     }
 
     @Override
